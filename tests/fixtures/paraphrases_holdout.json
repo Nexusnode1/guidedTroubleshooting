@@ -1,0 +1,26 @@
+{
+  "positives": [
+    {"expect": "Email server", "query": "outlook says it cannot connect to the mail server on my tablet"},
+    {"expect": "Email server", "query": "my email app will not load any new messages"},
+    {"expect": "Blank black display", "query": "the display is dead, phone buzzes but the screen stays off"},
+    {"expect": "Blank black display", "query": "my galaxy will not power up at all"},
+    {"expect": "Access phone's data", "query": "screen will not respond to touch, how can I connect a mouse to copy my files"},
+    {"expect": "Access phone's data", "query": "I cannot see my display and want to save my pictures before repair"},
+    {"expect": "Cracked bleeding screen", "query": "shattered glass across the front of my galaxy"},
+    {"expect": "Cracked bleeding screen", "query": "ink spots and coloured lines are showing on the panel"},
+    {"expect": "Touchscreen issues", "query": "taps register late and the screen feels sluggish"},
+    {"expect": "Touchscreen issues", "query": "my screen protector makes touch input unreliable"},
+    {"expect": "Transfer secure folder", "query": "moving my files to a new galaxy using smart switch"},
+    {"expect": "Transfer secure folder", "query": "scan the QR code to send content between two phones"},
+    {"expect": "Screen flickers", "query": "video from the camera app shows flickering bands"},
+    {"expect": "Screen flickers", "query": "footage shot indoors under LED lights flickers"}
+  ],
+  "negatives": [
+    "recommend a good sci-fi novel",
+    "how do I reset my bank password",
+    "what time is sunset today",
+    "convert 10 miles to kilometres",
+    "who won the football match last night",
+    "cheap hotels near the airport"
+  ]
+}

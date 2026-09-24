@@ -1,0 +1,19 @@
+{
+  "_disclaimer": "Held-out paraphrases for tests/fixtures/domain_articles.json (author-written, not official). Written before any embedding model or threshold choice was made for these domains.",
+  "positives": [
+    {"expect": "Battery draining quickly", "query": "my phone's battery dies so quickly, i barely get half a day out of it"},
+    {"expect": "Battery draining quickly", "query": "battery percentage keeps dropping fast even when i'm not using the phone much"},
+    {"expect": "Camera app closes", "query": "whenever i tap the camera icon it force closes right away"},
+    {"expect": "Camera app closes", "query": "camera keeps crashing every time i try to take a photo"},
+    {"expect": "Device running slow", "query": "everything on my phone feels sluggish since the recent software update"},
+    {"expect": "Device running slow", "query": "apps are lagging and taking ages to load on my galaxy"}
+  ],
+  "negatives": [
+    "best way to cook rice",
+    "who is the president of france",
+    "convert celsius to fahrenheit",
+    "nearest coffee shop",
+    "how to tie a tie",
+    "capital of australia"
+  ]
+}

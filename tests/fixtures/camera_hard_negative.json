@@ -1,0 +1,36 @@
+{
+  "_label": "SYNTHETIC HARD-NEGATIVE FIXTURE",
+  "_disclaimer": "Deterministic fixture around one observed retrieval confusion (docs/camera_hard_negative_analysis.md). Both sides are references to the already-verified, catalog-grounded articles in tests/fixtures/cross_domain_articles.json (SYNTHETIC DOMAIN GENERALIZATION FIXTURE) -- not new invented content, not an unrelated negative. Every canonical_query and paraphrase here is copied verbatim from that fixture so both files stay in sync; see that file for the article content and verified deeplink targets.",
+  "positive": {
+    "fixture_id": "camera_wont_open_permission",
+    "canonical_query": "My camera app won't open on my Galaxy phone, it just doesn't launch at all.",
+    "paraphrases": [
+      "The camera app just refuses to open when I tap it.",
+      "Nothing happens when I try to launch the camera.",
+      "Camera app won't launch.",
+      "Why won't my camera app open at all?",
+      "This is so annoying, I tap the camera icon and literally nothing happens."
+    ]
+  },
+  "hard_negative": {
+    "fixture_id": "camera_crashes_freezes",
+    "canonical_query": "My camera app keeps crashing or freezing whenever I try to take a photo.",
+    "paraphrases": [
+      "The camera freezes up every time I try to snap a picture.",
+      "Camera app crashes constantly when I open it.",
+      "Camera keeps crashing.",
+      "Why does my camera app keep freezing when I try to use it?",
+      "It's so frustrating, the camera crashes almost every single time I open it."
+    ]
+  },
+  "confusable_query": {
+    "text": "This is so annoying, I tap the camera icon and literally nothing happens.",
+    "source": "positive.paraphrases[4] -- authored as a paraphrase of camera_wont_open_permission, observed in scripts/benchmark_cross_domain.py to retrieve camera_crashes_freezes instead",
+    "why_confusable": "Ambiguous between 'the app never launches' (a permission/launch problem) and 'the app launches and immediately dies' (a crash); a real customer complaint phrased this way could plausibly mean either.",
+    "observed_dense_scores": {"positive": 0.6359, "hard_negative": 0.6663, "positive_rank": 2, "hard_negative_rank": 1}
+  },
+  "expected_ranking": {
+    "rule": "For every text listed under positive.paraphrases (including the confusable_query, which is one of them), the correct top-1 retrieval target is camera_wont_open_permission. For every text under hard_negative.paraphrases, the correct top-1 target is camera_crashes_freezes.",
+    "known_exception": "positive.paraphrases[4] (confusable_query) currently retrieves camera_crashes_freezes at rank 1 with the current, non-fine-tuned embedding model -- this is the one frozen-baseline failure this fixture exists to track (see docs/camera_hard_negative_analysis.md and tests/test_camera_hard_negative.py)."
+  }
+}

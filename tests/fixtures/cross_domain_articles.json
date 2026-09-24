@@ -1,0 +1,296 @@
+{
+  "_label": "SYNTHETIC DOMAIN GENERALIZATION FIXTURE",
+  "_disclaimer": "Every article, title, and query below is author-written for pipeline validation. None of this is official Samsung/SIIS content, and none of it claims to be. It exists to test whether the real troubleshoot(query, siis_response=...) pipeline generalizes past the Display-only official data, not to add official coverage for Battery, Camera, or Performance. Every actionableDeeplink target referenced is verified to exist verbatim in data/original/deeplinks.json before being written into an article's steps; where no catalog entry exists for an intent (checked, not assumed), the article is written so the real pipeline resolves it as Manual or the documented bixby://dummy_positive placeholder -- never a fabricated deeplink.",
+  "articles": [
+    {
+      "fixture_id": "battery_drain_fast",
+      "domain": "Battery",
+      "title": "Battery drains unusually fast on your Galaxy phone",
+      "content": "Smartphone,Others Mobile Battery drains unusually fast on your Galaxy phone ( Smartphone,Others Mobile): # Troubleshooting Fast Battery Drain\n## Turn On Power Saving\nGo to Settings. Tap Battery. Tap the switch next to Power saving to turn it on.\n## Enable Adaptive Battery\nGo to Settings. Tap Battery. Tap the switch next to Adaptive battery to enable it.\n## Put Unused Apps To Sleep\nGo to Settings. Tap Battery. Tap Put unused apps to sleep.\n## Restart Your Device\nPress and hold the Power button, then tap Restart. Tap Restart again to confirm.\n",
+      "canonical_query": "My Galaxy phone's battery is draining much faster than it used to.",
+      "paraphrases": [
+        "My battery just doesn't last anywhere near as long as it used to.",
+        "Battery life has gotten really bad on my phone lately.",
+        "Battery drains super fast now.",
+        "Why is my battery draining so much quicker than before?",
+        "This is so frustrating, my battery used to last all day and now it's dead by lunch."
+      ],
+      "expected_deeplink_ids": [
+        "DL-0412",
+        "DL-0398",
+        "DL-0544"
+      ],
+      "note": "Reachable, verified catalog entries: Power saving (key='Power saving'), Adaptive battery (key='Adaptive battery'), Put unused apps to sleep (key='Put unused apps to sleep')."
+    },
+    {
+      "fixture_id": "battery_protection_limit",
+      "domain": "Battery",
+      "title": "Set a charging limit to protect your battery on a Galaxy phone",
+      "content": "Smartphone,Others Mobile Set a charging limit to protect your battery on a Galaxy phone ( Smartphone,Others Mobile): # Protecting Your Battery Health\n## Turn On Battery Protection\nGo to Settings. Tap Battery. Tap the switch next to Battery protection to turn it on.\n## Check Your Battery Percentage\nGo to Settings. Tap Battery. Tap Show battery percentage.\n",
+      "canonical_query": "I want to limit my Galaxy phone's charging to protect the battery long term.",
+      "paraphrases": [
+        "How do I stop my phone from charging past a certain percentage to protect the battery?",
+        "I heard you can cap charging at 85% to help battery health, how do I turn that on?",
+        "Want to set a charging limit for battery protection.",
+        "Is there a way to protect my battery by not letting it charge all the way?",
+        "I keep hearing full charges wear out the battery, how do I limit it on my Galaxy?"
+      ],
+      "expected_deeplink_ids": [
+        "DL-0410",
+        "DL-0552"
+      ],
+      "note": "Reachable, verified: Battery protection (key='Battery protection'), Show battery percentage (key='Show battery percentage')."
+    },
+    {
+      "fixture_id": "fast_charging_slower_than_before",
+      "domain": "Battery",
+      "title": "Charging speed troubleshooting on a Galaxy phone",
+      "content": "Smartphone,Others Mobile Charging speed troubleshooting on a Galaxy phone ( Smartphone,Others Mobile): # My Phone Seems To Charge Slower Than It Used To\n## Check Fast Charging Settings\nGo to Settings. Tap Battery. Tap Fast charging.\n## Try A Different Charger\nUse a different, undamaged charger and cable to see if charging speed improves.\n",
+      "canonical_query": "My Galaxy phone seems to be charging a lot slower than it used to.",
+      "paraphrases": [
+        "Charging takes forever now compared to before.",
+        "My phone used to charge quickly and now it's really slow.",
+        "Charging speed dropped a lot recently.",
+        "Why does my phone take so much longer to charge now?",
+        "It's annoying, charging used to be fast and now I have to wait forever."
+      ],
+      "expected_deeplink_ids": [
+        "DL-0403",
+        "DL-0404",
+        "DL-0514"
+      ],
+      "note": "Reachable, verified: Fast charging (key='Fast charging', three entries share this key: DL-0403 off, DL-0404 on, DL-0514 onClickURL)."
+    },
+    {
+      "fixture_id": "overheating_while_charging",
+      "domain": "Battery",
+      "title": "My phone gets hot while charging or during heavy use",
+      "content": "Smartphone,Others Mobile My phone gets hot while charging or during heavy use ( Smartphone,Others Mobile): # Troubleshooting Device Overheating\n## Turn Off Fast Charging\nGo to Settings. Tap Battery. Tap the switch next to Fast charging to turn it off.\n## Diagnose Overheating\nOpen Samsung Members and run the overheating diagnostic to check your device.\n## Avoid Using The Phone While Charging\nAvoid using your phone for demanding tasks while it is charging, and let it cool down in a shaded area if it feels hot.\n",
+      "canonical_query": "My Galaxy phone gets really hot when I'm charging it or using it heavily.",
+      "paraphrases": [
+        "My phone heats up a lot whenever I charge it.",
+        "It gets uncomfortably warm during charging or gaming.",
+        "Phone overheats when charging.",
+        "Why does my phone get so hot while it's plugged in?",
+        "This thing gets scorching hot every time I charge it, it's worrying me."
+      ],
+      "expected_deeplink_ids": [
+        "DL-0403"
+      ],
+      "note": "DELIBERATE unreachable-diagnostic case: 'Diagnose Overheating' (DL-0476) has validation=null (no key at all), so it cannot be matched by the exact-label KeyIndex no matter the wording -- verified before writing this article, not assumed. That step is expected to resolve as Manual, not a placeholder or fabricated link. The only reachable target here is Fast charging (DL-0403, offURL)."
+    },
+    {
+      "fixture_id": "battery_health_check",
+      "domain": "Battery",
+      "title": "Check your Galaxy phone's battery health",
+      "content": "Smartphone,Others Mobile Check your Galaxy phone's battery health ( Smartphone,Others Mobile): # Checking Battery Health And Status\n## View Your Battery Percentage\nGo to Settings. Tap Battery. Tap Show battery percentage.\n## Diagnose Battery Status\nOpen Samsung Members. Tap Diagnose battery status to check your battery's condition.\n",
+      "canonical_query": "How do I check my Galaxy phone's battery health and see if it's degraded?",
+      "paraphrases": [
+        "Is there a way to see how healthy my battery still is?",
+        "I want to check if my battery has degraded over time.",
+        "Check battery health.",
+        "How can I tell if my battery is wearing out?",
+        "My battery feels weaker lately, how do I check its actual health?"
+      ],
+      "expected_deeplink_ids": [
+        "DL-0552",
+        "DL-0477"
+      ],
+      "note": "Reachable, verified: Show battery percentage (DL-0552), Diagnose battery status (DL-0477, key='Diagnose battery status' -- unlike 'Diagnose Battery Drain'/DL-0474, this one does have a real key)."
+    },
+    {
+      "fixture_id": "camera_wont_open_permission",
+      "domain": "Camera",
+      "title": "Camera app won't open due to permission on a Galaxy phone",
+      "content": "Smartphone,Others Mobile Camera app won't open due to permission on a Galaxy phone ( Smartphone,Others Mobile): # Troubleshooting Camera Permission Issues\n## Check Camera Access\nGo to Settings. Tap Apps. Tap Camera. Tap Camera access to make sure the app is allowed to use the camera.\n## Restart Your Phone\nPress and hold the Power button, then tap Restart. Tap Restart again to confirm.\n",
+      "canonical_query": "My camera app won't open on my Galaxy phone, it just doesn't launch at all.",
+      "paraphrases": [
+        "The camera app just refuses to open when I tap it.",
+        "Nothing happens when I try to launch the camera.",
+        "Camera app won't launch.",
+        "Why won't my camera app open at all?",
+        "This is so annoying, I tap the camera icon and literally nothing happens."
+      ],
+      "expected_deeplink_ids": [
+        "DL-0197"
+      ],
+      "note": "Reachable, verified: Camera access (key='Camera access')."
+    },
+    {
+      "fixture_id": "camera_crashes_freezes",
+      "domain": "Camera",
+      "title": "Camera app crashes or freezes on a Galaxy phone",
+      "content": "Smartphone,Others Mobile Camera app crashes or freezes on a Galaxy phone ( Smartphone,Others Mobile): # Troubleshooting A Crashing Camera App\n## Clear The Camera App Cache\nGo to Settings. Tap Apps. Tap Camera. Tap Storage. Tap Clear cache.\n## Restart In Safe Mode\nPress and hold the Power button, then touch and hold Power off, then tap Safe mode.\nCheck if the camera still crashes in Safe mode.\n## Update Your Software\nKeeping your device's software updated regularly helps the camera app run smoothly.\n",
+      "canonical_query": "My camera app keeps crashing or freezing whenever I try to take a photo.",
+      "paraphrases": [
+        "The camera freezes up every time I try to snap a picture.",
+        "Camera app crashes constantly when I open it.",
+        "Camera keeps crashing.",
+        "Why does my camera app keep freezing when I try to use it?",
+        "It's so frustrating, the camera crashes almost every single time I open it."
+      ],
+      "expected_deeplink_ids": [],
+      "note": "DELIBERATE no-catalog-target case: there is no 'Storage' deeplink in the catalog (verified), so 'Tap Storage. Tap Clear cache.' is expected to resolve to the documented bixby://dummy_positive placeholder -- 'Clear cache' itself is excluded as an action button by the matcher, so the placeholder should be built from the preceding 'Storage' label."
+    },
+    {
+      "fixture_id": "camera_vibrates_unexpectedly",
+      "domain": "Camera",
+      "title": "Camera vibrates unexpectedly on a Galaxy phone",
+      "content": "Smartphone,Others Mobile Camera vibrates unexpectedly on a Galaxy phone ( Smartphone,Others Mobile): # Troubleshooting Unwanted Camera Vibration\n## Turn Off Camera Feedback\nGo to Settings. Tap Sounds and vibration. Tap the switch next to Camera feedback to turn it off.\n",
+      "canonical_query": "My phone vibrates every time I use the camera and I don't want it to.",
+      "paraphrases": [
+        "The camera buzzes or vibrates whenever I open it and I want that off.",
+        "There's this vibration whenever I use the camera app, how do I stop it?",
+        "Camera vibrates when I don't want it to.",
+        "How do I turn off the vibration that happens when I use the camera?",
+        "It keeps buzzing every time I take a photo, it's kind of annoying."
+      ],
+      "expected_deeplink_ids": [
+        "DL-0053"
+      ],
+      "note": "Reachable, verified: Camera feedback (key='Camera feedback', vibration when using the camera)."
+    },
+    {
+      "fixture_id": "camera_led_flash_notification",
+      "domain": "Camera",
+      "title": "Camera flash for notifications not working on a Galaxy phone",
+      "content": "Smartphone,Others Mobile Camera flash for notifications not working on a Galaxy phone ( Smartphone,Others Mobile): # Troubleshooting Camera Flash Notifications\n## Turn On Camera Flash Notification\nGo to Settings. Tap Accessibility. Tap the switch next to Camera flash notification to turn it on.\n",
+      "canonical_query": "The camera light isn't flashing for my notifications like it used to.",
+      "paraphrases": [
+        "My phone used to flash the camera light for alerts and now it doesn't.",
+        "The flash notification light isn't going off anymore for messages.",
+        "Camera flash alerts stopped working.",
+        "Why isn't the camera light flashing for notifications anymore?",
+        "It used to flash for every notification and now it just doesn't do that at all."
+      ],
+      "expected_deeplink_ids": [
+        "DL-0056"
+      ],
+      "note": "Reachable, verified: Camera flash notification (key='Camera flash notification'). This is about the camera LED flashing as a notification alert, not a photo-taking flash -- kept scoped to what the catalog entry actually describes."
+    },
+    {
+      "fixture_id": "camera_photo_quality_blurry",
+      "domain": "Camera",
+      "title": "Photos from the camera look blurry on a Galaxy phone",
+      "content": "Smartphone,Others Mobile Photos from the camera look blurry on a Galaxy phone ( Smartphone,Others Mobile): # Troubleshooting Blurry Camera Photos\n## Clean The Camera Lens\nCheck the camera lens for smudges, dust, or a scratched or cracked lens cover, and gently clean it with a soft, lint-free cloth.\n## Hold The Phone Steady\nHold your phone steady and tap the screen to focus before taking the photo.\n## Contact Samsung Support\nIf your photos are still blurry after cleaning the lens and checking focus, please contact Samsung Support to arrange for service in case the lens itself is damaged.\n",
+      "canonical_query": "My camera photos are coming out really blurry on my Galaxy phone.",
+      "paraphrases": [
+        "Every photo I take looks blurry lately.",
+        "Pictures from my camera just aren't sharp anymore.",
+        "Camera photos are blurry.",
+        "Why are all my photos coming out so blurry?",
+        "It's so annoying, every picture I take is out of focus and blurry."
+      ],
+      "expected_deeplink_ids": [],
+      "note": "DELIBERATE no-catalog-target case, verified: the catalog has no entry for photo focus/sharpness/lens quality at all. Every step here is expected to be Manual with no actionableDeeplink."
+    },
+    {
+      "fixture_id": "camera_share_webcam_not_working",
+      "domain": "Camera",
+      "title": "Camera Share as a webcam isn't working on a Galaxy phone",
+      "content": "Smartphone,Others Mobile Camera Share as a webcam isn't working on a Galaxy phone ( Smartphone,Others Mobile): # Troubleshooting Camera Share\n## Check Camera Share Settings\nGo to Settings. Tap Advanced features. Tap Camera Share to make sure it's set up correctly.\n",
+      "canonical_query": "I can't get Camera Share to work so I can use my phone's camera as a webcam on my laptop.",
+      "paraphrases": [
+        "Trying to use my phone as a webcam with Camera Share and it's not working.",
+        "Camera Share won't connect to my computer.",
+        "Camera Share isn't working as a webcam.",
+        "How do I get Camera Share working so my phone can act as a webcam?",
+        "I keep trying to use my phone's camera on my laptop through Camera Share and it just won't connect."
+      ],
+      "expected_deeplink_ids": [
+        "DL-0130"
+      ],
+      "note": "Reachable, verified: Camera Share (key='Camera Share')."
+    },
+    {
+      "fixture_id": "performance_slow_after_update",
+      "domain": "Performance",
+      "title": "Device runs slowly after a software update on a Galaxy phone",
+      "content": "Smartphone,Others Mobile Device runs slowly after a software update on a Galaxy phone ( Smartphone,Others Mobile): # Troubleshooting Slow Performance After An Update\n## Adjust Performance Profile\nGo to Settings. Tap Battery and device care. Tap Performance profile.\n## Restart Your Device\nPress and hold the Power button, then tap Restart. Tap Restart again to confirm.\n",
+      "canonical_query": "My Galaxy phone has been really slow and laggy ever since the last software update.",
+      "paraphrases": [
+        "Everything feels sluggish since the update went through.",
+        "My phone got so much slower after updating.",
+        "Phone is laggy since the update.",
+        "Why did my phone get so slow right after the update?",
+        "This update really slowed my phone down and it's driving me crazy."
+      ],
+      "expected_deeplink_ids": [
+        "DL-0418"
+      ],
+      "note": "Reachable, verified: Performance profile (key='Performance profile')."
+    },
+    {
+      "fixture_id": "performance_apps_closing_background",
+      "domain": "Performance",
+      "title": "Apps keep closing in the background on a Galaxy phone",
+      "content": "Smartphone,Others Mobile Apps keep closing in the background on a Galaxy phone ( Smartphone,Others Mobile): # Troubleshooting Background Apps Closing\n## Adjust Put Unused Apps To Sleep\nGo to Settings. Tap Battery and device care. Tap the switch next to Put unused apps to sleep to turn it off.\n",
+      "canonical_query": "Apps keep getting closed in the background on my Galaxy phone and I have to keep reopening them.",
+      "paraphrases": [
+        "My apps close in the background all the time and I lose my progress.",
+        "Background apps keep getting killed on my phone.",
+        "Apps close on their own in the background.",
+        "Why do my apps keep closing when I'm not using them?",
+        "It's so annoying, I switch away for a minute and the app's already closed when I come back."
+      ],
+      "expected_deeplink_ids": [
+        "DL-0416"
+      ],
+      "note": "Reachable, verified: Put unused apps to sleep (key='Put unused apps to sleep', offURL to disable it)."
+    },
+    {
+      "fixture_id": "performance_want_scheduled_restart",
+      "domain": "Performance",
+      "title": "Set up automatic restarts to keep a Galaxy phone running smoothly",
+      "content": "Smartphone,Others Mobile Set up automatic restarts to keep a Galaxy phone running smoothly ( Smartphone,Others Mobile): # Keeping Your Device Running Smoothly With Automatic Restarts\n## Turn On Restart The Device When Needed\nGo to Settings. Tap Battery and device care. Tap the switch next to Restart the device when needed to turn it on.\n",
+      "canonical_query": "I want my Galaxy phone to restart automatically every so often to keep it running smoothly.",
+      "paraphrases": [
+        "How do I get my phone to restart itself regularly to stay fast?",
+        "I want automatic restarts set up so my phone doesn't slow down over time.",
+        "Set up automatic restarts.",
+        "Is there a setting so my phone restarts on its own to keep performance up?",
+        "I heard restarting your phone regularly keeps it fast, how do I automate that?"
+      ],
+      "expected_deeplink_ids": [
+        "DL-0480"
+      ],
+      "note": "Reachable, verified: Restart the device when needed (key='Restart the device when needed')."
+    },
+    {
+      "fixture_id": "performance_overheating_during_gaming",
+      "domain": "Performance",
+      "title": "Device overheats and slows down during gaming on a Galaxy phone",
+      "content": "Smartphone,Others Mobile Device overheats and slows down during gaming on a Galaxy phone ( Smartphone,Others Mobile): # Troubleshooting Overheating During Gaming\n## Adjust Performance Profile\nGo to Settings. Tap Battery and device care. Tap Performance profile. Select a lighter performance option to reduce heat.\n## Diagnose Overheating\nOpen Samsung Members and run the overheating diagnostic to check your device.\n## Take Breaks During Long Gaming Sessions\nTake short breaks during long gaming sessions and avoid charging your phone while playing to help it stay cooler.\n",
+      "canonical_query": "My Galaxy phone overheats and slows down a lot when I'm gaming.",
+      "paraphrases": [
+        "My phone gets really hot and starts lagging when I play games.",
+        "Gaming makes my phone overheat and it starts stuttering.",
+        "Phone overheats during gaming.",
+        "Why does my phone get so hot and slow down when I game?",
+        "It's so frustrating, ten minutes into a game and my phone's already burning hot and lagging."
+      ],
+      "expected_deeplink_ids": [
+        "DL-0418"
+      ],
+      "note": "DELIBERATE unreachable-diagnostic case, same as overheating_while_charging: 'Diagnose Overheating' (DL-0476) has no validation.key, verified before writing. Only Performance profile (DL-0418) is a reachable target here."
+    },
+    {
+      "fixture_id": "performance_optimize_one_tap",
+      "domain": "Performance",
+      "title": "Speed up a slow Galaxy phone with one-tap device optimization",
+      "content": "Smartphone,Others Mobile Speed up a slow Galaxy phone with one-tap device optimization ( Smartphone,Others Mobile): # Using One-Tap Optimization To Speed Up Your Device\n## Run Device Care Optimization\nGo to Settings. Tap Battery and device care. Tap Optimize now to clean memory and improve performance.\n",
+      "canonical_query": "How do I use the one-tap optimizer on my Galaxy phone to speed it up?",
+      "paraphrases": [
+        "I want to run that device optimization thing to clean up my phone.",
+        "How do I optimize my phone in one tap to make it faster?",
+        "Run one-tap optimization.",
+        "Where's the button to optimize my device and speed it up?",
+        "I remember seeing a button that cleans and speeds up the phone in one tap, how do I use it?"
+      ],
+      "expected_deeplink_ids": [
+        "DL-0560"
+      ],
+      "note": "KNOWN LIMITATION, verified and documented (see docs/cross_domain_generalization.md and app/services/key_matcher.py's find() docstring): 'Optimize Device Performance' (DL-0538) matches this intent's name almost exactly but has validation=null (no key), so it cannot be matched. The matcher then falls back to the ancestor screen 'Battery' (DL-0560) mentioned earlier in the same step -- a parent-menu match, not the specific destination. A fix was attempted and reverted because it regressed an official row (row_21); tracked as open, not papered over by rewording this article."
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+# Local/dev artifacts -- never needed to build or run the image, and rebuilding
+# data/processed/ from official data at image build time (see Dockerfile) is what makes
+# the image reproducible regardless of what happens to be on the build machine's disk.
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.git/
+.gitignore
+.env
+data/processed/
+models/
+frontend/node_modules/
+frontend/dist/
+
+# Not needed to serve the API; keeps the image smaller and more production-like.
+docs/
+tests/
+scripts/dev.ps1
+*.md
+Dockerfile
+docker-compose.yml
+.dockerignore

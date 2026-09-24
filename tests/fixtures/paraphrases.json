@@ -1,0 +1,26 @@
+{
+  "positives": [
+    {"expect": "Email server", "query": "I can't open my email and the app says the server is not responding"},
+    {"expect": "Email server", "query": "gmail keeps failing to sync on my galaxy tablet"},
+    {"expect": "Blank black display", "query": "my phone screen is black and will not turn on"},
+    {"expect": "Blank black display", "query": "screen is completely dark, nothing shows up when I press the power button"},
+    {"expect": "Access phone's data", "query": "how do I back up my data when the screen is not working"},
+    {"expect": "Access phone's data", "query": "phone screen is smashed and I can't see anything, how do I get my photos off"},
+    {"expect": "Cracked bleeding screen", "query": "my phone screen is cracked and broken"},
+    {"expect": "Cracked bleeding screen", "query": "there are lines and dead pixels on my display after I dropped it"},
+    {"expect": "Touchscreen issues", "query": "touchscreen is laggy and not responding to my taps"},
+    {"expect": "Touchscreen issues", "query": "phone does not react when I touch the screen"},
+    {"expect": "Transfer secure folder", "query": "how do I transfer data using smart switch with a QR code"},
+    {"expect": "Transfer secure folder", "query": "smart switch wireless transfer from old phone to new phone"},
+    {"expect": "Screen flickers", "query": "screen flickers when I record video with the camera"},
+    {"expect": "Screen flickers", "query": "camera video has black bars and flicker"}
+  ],
+  "negatives": [
+    "what is the best pasta recipe",
+    "how tall is mount everest",
+    "book me a flight to paris",
+    "play some music",
+    "what is the weather tomorrow",
+    "translate hello into french"
+  ]
+}

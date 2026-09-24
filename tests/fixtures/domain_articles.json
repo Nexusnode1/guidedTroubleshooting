@@ -1,0 +1,35 @@
+{
+  "_disclaimer": "Author-written test articles, not official Samsung SIIS content. They exist to prove the rules-only pipeline generalizes past the Display domain the 20 official siis_responses.json rows cover, since the PDF describes four domains (Battery, Display, Camera, Performance). Every actionable deeplink referenced below is matched against the real, official data/original/deeplinks.json catalog by the same code path as the official rows; nothing here fabricates a URI. Never treated as, or copied into, the official data directory.",
+  "articles": [
+    {
+      "id": "battery_drain",
+      "domain": "Battery",
+      "query": "My Galaxy S24 battery drains really fast, it goes from 100 to 20 percent in a few hours",
+      "expected_title": "Battery draining quickly",
+      "siis_response": {
+        "title": "Battery draining quickly on your Galaxy phone",
+        "content": "Smartphone,Others Mobile Battery draining quickly on your Galaxy phone ( Smartphone,Others Mobile): # Troubleshooting Fast Battery Drain\nLet's go through some steps to extend your battery life.\n## Step 1: Turn On Power Saving\nGo to Settings. Tap Battery. Tap the switch next to Power saving to turn it on.\n## Step 2: Enable Adaptive Battery\nGo to Settings. Tap Battery. Tap the switch next to Adaptive battery to enable it.\n## Step 3: Put Unused Apps To Sleep\nGo to Settings. Tap Battery. Tap Put unused apps to sleep.\n## Step 4: Restart Your Device\nPress and hold the Power button, then tap Restart. Tap Restart again to confirm.\n## Step 5: Contact Samsung Support\nIf the battery still drains quickly after these steps, please contact Samsung Support to arrange for service.\n"
+      }
+    },
+    {
+      "id": "camera_crash",
+      "domain": "Camera",
+      "query": "the camera app on my phone won't open, it just crashes back to the home screen",
+      "expected_title": "Camera app closes",
+      "siis_response": {
+        "title": "Camera app closes or will not open on your Galaxy phone",
+        "content": "Smartphone,Others Mobile Camera app closes or will not open on your Galaxy phone ( Smartphone,Others Mobile): # Troubleshooting Camera App Crashes\nLet's go through some steps to get your camera working again.\n## Step 1: Check Camera Access\nGo to Settings. Tap Apps. Tap Camera access to confirm the app is allowed to use the camera.\n## Step 2: Clear The Camera App Cache\nNavigate to Settings. Tap Apps. Select Camera. Tap Storage. Tap Clear cache.\n## Step 3: Restart Your Phone In Safe Mode\nPress and hold the Power button, then touch and hold Power off, then tap Safe mode.\nCheck if the camera still crashes in Safe mode.\n## Step 4: Update Your Software\nKeeping your device's software updated regularly ensures the camera app continues to run smoothly.\n## Step 5: Contact Samsung Support\nIf the issue persists after completing all the above steps, please contact Samsung Support to arrange for service.\n"
+      }
+    },
+    {
+      "id": "slow_performance",
+      "domain": "Performance",
+      "query": "my phone got really slow and laggy after the last update, apps take forever to open",
+      "expected_title": "Device running slow",
+      "siis_response": {
+        "title": "Device running slow on your Galaxy phone",
+        "content": "Smartphone,Others Mobile Device running slow on your Galaxy phone ( Smartphone,Others Mobile): # Troubleshooting Slow Performance\nLet's go through some steps to speed your device back up.\n## Step 1: Adjust Performance Profile\nGo to Settings. Tap Battery and device care. Tap Performance profile.\n## Step 2: Put Unused Apps To Sleep\nGo to Settings. Tap Battery and device care. Tap the switch next to Put unused apps to sleep to enable it.\n## Step 3: Restart Your Device\nPress and hold the Power button, then tap Restart. Tap Restart again to confirm.\n## Step 4: Perform A Factory Data Reset\nNote: A factory data reset will erase all personal information from your device. Back up your data before proceeding.\nNavigate to Settings, search for and select Factory data reset, and then tap Factory data reset again.\nReview the information presented, then tap Reset, and then tap Delete all.\n## Step 5: Contact Samsung Support\nIf the issue persists after completing all the above steps, please contact Samsung Support to arrange for service.\n"
+      }
+    }
+  ]
+}

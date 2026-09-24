@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+env/
+
+# Environment and logs
+.env
+*.log
+logs/
+tmp/
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Node / React
+node_modules/
+build/
+dist/
+
+# Generated ML and vector assets
+data/processed/*
+!data/processed/.gitkeep
+*.faiss
+*.index
+*.npy
+*.npz
+*.pkl
+*.joblib
+
+# Generated
+data/processed/plan_cache.json
+frontend/node_modules/
+frontend/dist/
+/models/
+data/processed/training_pairs.jsonl

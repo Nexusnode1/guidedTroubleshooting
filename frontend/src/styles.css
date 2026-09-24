@@ -1,0 +1,102 @@
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --ink: #16181d;
+  --muted: #5d6470;
+  --line: #dfe3e8;
+  --accent: #1a56db;
+  --auto: #146c43;
+  --manual: #6b4f00;
+  --critical: #b42318;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1216;
+    --surface: #171b21;
+    --ink: #eceff4;
+    --muted: #9aa3b0;
+    --line: #2a303a;
+    --accent: #7aa2ff;
+    --auto: #5fd39a;
+    --manual: #e5c05c;
+    --critical: #ff8a80;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+button, input { font: inherit; color: inherit; }
+
+.app { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 24px; max-width: 1180px; margin: 0 auto; padding: 24px 16px; min-height: 100vh; }
+.chat { display: flex; flex-direction: column; min-width: 0; }
+.chat__head h1 { margin: 0 0 4px; font-size: 1.5rem; }
+.chat__head p { margin: 0 0 16px; color: var(--muted); }
+.thread { flex: 1; display: flex; flex-direction: column; gap: 12px; padding-bottom: 16px; }
+.examples { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+.chip:hover { border-color: var(--accent); }
+
+.bubble { margin: 0; padding: 12px 14px; border-radius: 14px; max-width: 100%; }
+.bubble--user { align-self: flex-end; background: var(--accent); color: #fff; max-width: 85%; }
+.bubble--bot { background: var(--surface); border: 1px solid var(--line); }
+.bubble--error { background: color-mix(in srgb, var(--critical) 12%, var(--surface)); border: 1px solid var(--critical); }
+.bubble--pending { color: var(--muted); }
+.meta { margin: 10px 0 0; color: var(--muted); font-size: 0.8rem; }
+
+.plan__goal { margin: 0 0 10px; font-size: 1.05rem; }
+.plan__actions { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.action { border: 1px solid var(--line); border-left-width: 4px; border-radius: 10px; padding: 10px 12px; }
+.action--auto { border-left-color: var(--auto); }
+.action--manual { border-left-color: var(--manual); }
+.action--critical { border-left-color: var(--critical); }
+.action__head { display: flex; align-items: center; gap: 8px; }
+.action__name { margin: 0; font-size: 1rem; }
+.action__desc { margin: 4px 0 6px; color: var(--muted); font-size: 0.9rem; }
+.action__warn { margin: 0 0 6px; color: var(--critical); font-size: 0.9rem; font-weight: 600; }
+.badge { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor; }
+.badge--auto { color: var(--auto); }
+.badge--manual { color: var(--manual); }
+.badge--critical { color: var(--critical); }
+.group { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.steps { margin: 4px 0 8px; padding-left: 1.3rem; }
+.open { flex: none; border: 1px solid var(--accent); background: transparent; color: var(--accent); border-radius: 8px; padding: 4px 14px; cursor: pointer; }
+.open:hover, .open[aria-pressed="true"] { background: var(--accent); color: #fff; }
+
+.cold-path { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; margin: 4px 0; background: var(--surface); }
+.cold-path summary { cursor: pointer; font-size: 0.9rem; color: var(--muted); }
+.cold-path summary:hover { color: var(--ink); }
+.cold-path__hint { margin: 8px 0; color: var(--muted); font-size: 0.85rem; }
+.cold-path__text { width: 100%; box-sizing: border-box; border: 1px solid var(--line); background: var(--bg); color: inherit; border-radius: 8px; padding: 8px 10px; font: inherit; resize: vertical; margin-bottom: 8px; }
+
+.composer { position: sticky; bottom: 0; display: flex; gap: 8px; padding: 12px 0; background: var(--bg); }
+.composer input { flex: 1; min-width: 0; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 10px 12px; }
+.composer button { border: 0; border-radius: 10px; background: var(--accent); color: #fff; padding: 0 18px; cursor: pointer; }
+.composer button:disabled { opacity: 0.5; cursor: not-allowed; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.side { position: sticky; top: 24px; align-self: start; }
+.phone__frame { width: 320px; margin: 0 auto; border: 10px solid #20242b; border-radius: 36px; background: var(--surface); overflow: hidden; min-height: 560px; }
+.phone__status { display: flex; justify-content: space-between; padding: 8px 18px; font-size: 0.8rem; color: var(--muted); }
+.phone__screen { padding: 8px 18px 24px; }
+.phone__app { margin: 0 0 16px; font-size: 1.6rem; }
+.phone__empty { color: var(--muted); }
+.phone__panel { animation: rise 180ms ease-out; }
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .phone__panel { animation: none; } }
+.phone__title { margin: 0 0 12px; font-size: 1.15rem; }
+.phone__note { margin: 12px 0 4px; font-weight: 600; }
+.phone__verified { margin: 0 0 12px; color: var(--auto); font-size: 0.9rem; }
+.phone__uri { display: block; color: var(--muted); font-size: 0.75rem; word-break: break-all; }
+.switch { display: inline-block; position: relative; }
+.switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; }
+.switch__track { display: block; width: 52px; height: 30px; border-radius: 999px; background: var(--line); position: relative; transition: background 150ms; }
+.switch__track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform 150ms; }
+.switch input:checked + .switch__track { background: var(--auto); }
+.switch input:checked + .switch__track::after { transform: translateX(22px); }
+.slider { width: 100%; }
+
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; }
+  .side { position: static; }
+}
