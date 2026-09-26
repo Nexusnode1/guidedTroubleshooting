@@ -13,6 +13,8 @@ from dataclasses import dataclass
 import re
 from typing import Any
 
+from app.services.catalog import PLACEHOLDER_TYPE
+
 
 STANDARD = "standard"
 MANUAL = "manual"
@@ -40,7 +42,6 @@ _DESCRIPTIVE_FIELDS = (
     "description", "message", "qna_description", "intent", "query",
 )
 _INTERACTION_TYPES = frozenset(("onurl", "offurl", "updateurl", "onclickurl"))
-_DUMMY_URI = "bixby://dummy_positive"
 _RANK = {STANDARD: 0, UNKNOWN: 1, MANUAL: 1, CRITICAL: 2}
 
 
@@ -98,11 +99,10 @@ def _category(action: Any) -> tuple[str, str]:
     if _CRITICAL_TEXT.search(description):
         return CRITICAL, "descriptive action text names a critical or disruptive operation"
 
-    uri = _read(action, "deeplink")
     original_type = _read(action, "originalType")
     normalized_type = original_type.casefold() if isinstance(original_type, str) else ""
-    if uri == _DUMMY_URI and "settings" in description.casefold():
-        return STANDARD, "dummy_positive is a catalog fallback for a Settings screen"
+    if normalized_type == PLACEHOLDER_TYPE and "settings" in description.casefold():
+        return STANDARD, "the catalog placeholder (dummy_positive) is a fallback for a Settings screen"
     # originalType is only supporting evidence; descriptive metadata must be
     # present before an interaction is treated as standard configuration.
     if normalized_type in _INTERACTION_TYPES and description:

@@ -29,7 +29,7 @@ unchanged (`sentence-transformers/all-mpnet-base-v2`).
 | battery_protection_limit | Battery | Set charging limit | DL-0410, DL-0552 | DL-0410, DL-0552 | yes | yes |
 | fast_charging_slower_than_before | Battery | Charging speed troubleshooting | DL-0514 | DL-0403, DL-0404, DL-0514 | yes | yes |
 | overheating_while_charging | Battery | Gets hot while | DL-0403 | DL-0403 | yes | yes |
-| battery_health_check | Battery | Phone's battery health | DL-0552, DL-0477 | DL-0552, DL-0477 | yes | yes |
+| battery_health_check | Battery | Galaxy phone's battery | DL-0552, DL-0477 | DL-0552, DL-0477 | yes | yes |
 | camera_wont_open_permission | Camera | Camera app won't | DL-0197 | DL-0197 | yes | yes |
 | camera_crashes_freezes | Camera | Camera app crashes | PLACEHOLDER | (none) | yes | yes |
 | camera_vibrates_unexpectedly | Camera | Camera vibrates unexpectedly | DL-0053 | DL-0053 | yes | yes |

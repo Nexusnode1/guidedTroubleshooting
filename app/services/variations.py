@@ -46,14 +46,14 @@ def generate_variations(query: str, topic: str) -> list[str]:
     topic_text = topic.lower()
     candidates = [
         query.strip(),
-        f"I am experiencing an issue with my Galaxy: {core}.",
+        f"I am experiencing an issue with my device: {core}.",
         f"my phone is acting up, {core}",
         keywords,
         f"This is so annoying - {core}, please help!",
         _with_typo(core),
         f"How do I fix this: {core}?",
         f"Why does this happen: {core}?",
-        f"Troubleshoot {topic_text} on my Galaxy",
+        f"Troubleshoot {topic_text} on my device",
         f"Help with {topic_text}",
     ]
     distinct = list(dict.fromkeys(_sentence(item) for item in candidates if item.strip()))

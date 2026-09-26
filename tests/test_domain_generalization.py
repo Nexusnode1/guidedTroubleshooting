@@ -98,11 +98,11 @@ def test_performance_profile_and_camera_access_resolve_to_their_catalog_entries(
     assert _link(builds["camera_crash"], "Check Camera Access")["deeplink"] == catalog_by_id["DL-0197"]["deeplink"]
 
 
-def test_a_camera_screen_with_no_catalog_entry_uses_the_documented_placeholder(builds):
+def test_a_camera_screen_with_no_catalog_entry_uses_the_documented_placeholder(builds, catalog_by_id):
     # There is no "Storage" deeplink in the catalog; the engine must say so honestly
-    # (bixby://dummy_positive) rather than inventing or omitting the action.
+    # (the catalog's own dummy_positive entry) rather than inventing or omitting the action.
     link = _link(builds["camera_crash"], "Clear The Camera App Cache")
-    assert link["deeplink"] == "bixby://dummy_positive"
+    assert link["deeplink"] == catalog_by_id["DL-DUMMY"]["deeplink"]
     assert 5 <= len(link["description"].split()) <= 7
 
 

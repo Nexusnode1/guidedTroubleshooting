@@ -25,20 +25,20 @@ addresses, then judge whether `original_query` describes that same problem.
 | --- | --- | --- | --- | --- |
 | row_1 | Screen flashes/blanks when opening Gmail | Email server not responding | MISALIGNED | Article is pure email-connectivity troubleshooting (Wi-Fi, cache, safe mode, contact provider); never addresses a display symptom. |
 | row_2 | Screen blank/white, no text, while searching a stock price or using an app | Blank or black display | MISALIGNED | Query describes a device that is on and interactive with a rendering/app problem; article's flow (check damage, force restart, charge) is for a device that will not power on at all. |
-| row_3 | Z Flip 7 fully black, unresponsive, need Smart Switch | Some things to check first | ALIGNED | Matches the article's own "access data via USB mouse when screen is blank" + force-restart content. |
-| row_4 | A15/A16 went black on its own, no display even trying to turn on | Blank or black display | ALIGNED | Squarely the "device not turning on" scenario. |
-| row_5 | Screen blank during Smart Switch QR scan, transfer can't proceed | Transfer Secure folder with Smart Switch | PARTIALLY_ALIGNED | Action/domain matches; "screen stays blank" is not a failure mode the article discusses — it explains the normal working flow only. |
-| row_7 | Screen mostly dark, only 3 icons lit, apps won't open | Use Multi window and App pairs | MISALIGNED | A feature how-to for split screen/app pairs/Edge panel, unrelated to a mostly-dark screen. |
-| row_8 | Phone's own screen stays small, doesn't fill display | Screen mirroring to your Samsung TV | MISALIGNED | Article is about mirroring/casting to a TV, not the phone's native display (it does have an "image looks small" remedy, but only in the TV-mirroring context). |
-| row_9 | Flip 7 inner screen dead (no image, no touch), outer screen fine | Access your Galaxy phone's data if the screen does not respond | ALIGNED | Matches "touchscreen doesn't work" / "nothing visible on screen" directly; foldable detail is device context, not a new symptom. |
-| row_10 | Flip 6 screen flickers/blanks when opening (unfolding) it | Screen flickers when using the Camera | MISALIGNED | Article is specifically camera-video flicker from lighting frequency, not a general system display flicker. |
-| row_11 | Flip 6 half the screen black, other half fine | Some things to check first | PARTIALLY_ALIGNED | General "screen not working" domain matches; "half black" is a more specific defect the article's generic remedies don't target. |
+| row_3 | Fold X1 fully black, unresponsive, need Data Transfer | Some things to check first | ALIGNED | Matches the article's own "access data via USB mouse when screen is blank" + force-restart content. |
+| row_4 | A14/A15 went black on its own, no display even trying to turn on | Blank or black display | ALIGNED | Squarely the "device not turning on" scenario. |
+| row_5 | Screen blank during Data Transfer QR scan, transfer can't proceed | Transfer Secure folder with Data Transfer | PARTIALLY_ALIGNED | Action/domain matches; "screen stays blank" is not a failure mode the article discusses — it explains the normal working flow only. |
+| row_7 | Screen mostly dark, only 3 icons lit, apps won't open | Use Multi window and App pairs | MISALIGNED | A feature how-to for split screen/app pairs/Quick Access panel, unrelated to a mostly-dark screen. |
+| row_8 | Phone's own screen stays small, doesn't fill display | Screen mirroring to your TechCorp TV | MISALIGNED | Article is about mirroring/casting to a TV, not the phone's native display (it does have an "image looks small" remedy, but only in the TV-mirroring context). |
+| row_9 | Fold X1 inner screen dead (no image, no touch), outer screen fine | Access your smartphone's data if the screen does not respond | ALIGNED | Matches "touchscreen doesn't work" / "nothing visible on screen" directly; foldable detail is device context, not a new symptom. |
+| row_10 | Fold X1 screen flickers/blanks when opening (unfolding) it | Screen flickers when using the Camera | MISALIGNED | Article is specifically camera-video flicker from lighting frequency, not a general system display flicker. |
+| row_11 | Fold X1 half the screen black, other half fine | Some things to check first | PARTIALLY_ALIGNED | General "screen not working" domain matches; "half black" is a more specific defect the article's generic remedies don't target. |
 | row_12 | Persistent floating circle with shortcuts | Use Multi window and App pairs | MISALIGNED | Described feature is an Assistant-Menu-style floating shortcut, not Multi Window/App pairs. |
 | row_13 | Blank screen, no activation message, after carrier deactivated old phone | Blank or black display | ALIGNED | "No display at power-up" matches the article; carrier-swap detail is device context. |
 | row_14 | Screen totally cracked | Cracked or bleeding screen | ALIGNED | Direct match. |
 | row_15 | Blue/black screen with tiny text, won't start, power button doesn't help | Blank or black display | ALIGNED | "Won't start up" boot failure matches the article's domain. |
 | row_16 | Momentary flash when plugging in a charger | Blank or black display | MISALIGNED | A brief flash on an apparently functioning device is a different failure class from "won't power on at all." |
-| row_17 | Dark screen, occasional scrolling, no content, can't use Smart Switch | Some things to check first | ALIGNED | Matches the article's blank-screen/data-access/force-restart content. |
+| row_17 | Dark screen, occasional scrolling, no content, can't use Data Transfer | Some things to check first | ALIGNED | Matches the article's blank-screen/data-access/force-restart content. |
 | row_19 | Cracked at fold again; touch dead in spots; can barely see | Cracked or bleeding screen | ALIGNED | All three symptoms consistent with physical screen damage. |
 | row_20 | Screen looks distorted, wants a diagnostic | Screen does not rotate | MISALIGNED | Article is about auto-rotate/orientation failing, a different symptom from visual distortion. |
 | row_21 | Touch input delayed/laggy | Touchscreen issues | ALIGNED | Direct match. |
@@ -64,10 +64,10 @@ vocabulary. Two corrected rows (`row_11`, `row_16`) initially failed this gate e
 their canonical query was already an honest, grounded description of what the article
 covers -- fixed by choosing wording that uses words the article itself actually contains
 ("black," "touchscreen," "restart") rather than paraphrasing them away. `row_17`, an
-**unmodified, already-ALIGNED** original query, still fails this same gate: it did so with
-its original wording before this audit too (see the `scripts/build_plans.py` warm-up log
-from prior work), so it is left untouched here rather than reworded just to satisfy an
-unrelated heuristic. This is documented as a known limitation, not fixed in this task: see
+**unmodified, already-ALIGNED** original query, failed this same gate under the earlier
+wording of the official data, and was left untouched rather than reworded just to satisfy an
+unrelated heuristic. With the current official wording it passes the gate and builds a valid
+plan. The gate itself is unchanged in kind (still lexical): see
 `docs/siis_dataset_quality_report.md` and the existing note in `docs/domain-coverage.md`.
 
 ## What corrections do

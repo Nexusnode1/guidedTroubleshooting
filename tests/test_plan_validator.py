@@ -10,14 +10,14 @@ from app.services.plan_validator import validate_plan
 CATALOG = {
     "deeplinks": [
         {
-            "deeplink": "bixby://masked/catalog-screen",
+            "deeplink": "test://masked/catalog-screen",
             "description": "Opens the battery settings page in device Settings.",
             "message": "Open Battery Settings",
             "originalType": "onClickURL",
-            "validation": {"deeplink": "bixby://masked/catalog-validation", "key": "Battery"},
+            "validation": {"deeplink": "test://masked/catalog-validation", "key": "Battery"},
         },
         {
-            "deeplink": "bixby://dummy_positive",
+            "deeplink": "test://dummy_positive",
             "description": "Generic placeholder for a Settings screen.",
             "message": "Open the relevant Settings screen",
             "originalType": "placeholder",
@@ -43,7 +43,7 @@ def _valid_plan() -> dict:
             "title": "Battery performance",
             "score": 0.95,
             "actions": [_action(deeplink={
-                "deeplink": "bixby://masked/catalog-screen",
+                "deeplink": "test://masked/catalog-screen",
                 "description": "Opens the battery settings page in device Settings.",
                 "message": "Open Battery Settings",
                 "originalType": "onClickURL",
@@ -59,7 +59,7 @@ def _result(plan: dict):
 def test_valid_catalog_deeplink_plan() -> None:
     plan = _valid_plan()
     plan["contexts"][0]["actions"][0]["stepGroups"][0]["validationDeeplink"] = {
-        "deeplink": "bixby://masked/catalog-validation",
+        "deeplink": "test://masked/catalog-validation",
         "key": "Battery",
         "resultType": "boolean",
         "condition": "equal",
@@ -79,7 +79,7 @@ def test_valid_manual_action_has_no_deeplink() -> None:
 def test_valid_dummy_positive_with_self_written_text() -> None:
     plan = _valid_plan()
     plan["contexts"][0]["actions"][0]["stepGroups"][0]["actionableDeeplink"] = {
-        "deeplink": "bixby://dummy_positive",
+        "deeplink": "test://dummy_positive",
         "description": "Opens the Storage Settings screen",
         "message": "Open the Storage screen in Settings",
         "originalType": "placeholder",
@@ -88,8 +88,8 @@ def test_valid_dummy_positive_with_self_written_text() -> None:
 
 
 @pytest.mark.parametrize("uri", [
-    "bixby://masked/not-in-catalog",
-    "bixby://masked/catalog-screen-modified",
+    "test://masked/not-in-catalog",
+    "test://masked/catalog-screen-modified",
     "https://example.com/settings",
     "http://example.com/settings",
     "[Settings](https://example.com)",
@@ -200,14 +200,14 @@ def test_manual_action_with_deeplink_is_rejected() -> None:
 
 def test_dummy_positive_with_wrong_word_count_is_rejected() -> None:
     plan = _valid_plan()
-    plan["contexts"][0]["actions"][0]["stepGroups"][0]["actionableDeeplink"]["deeplink"] = "bixby://dummy_positive"
+    plan["contexts"][0]["actions"][0]["stepGroups"][0]["actionableDeeplink"]["deeplink"] = "test://dummy_positive"
     assert _result(plan).valid is False
 
 
 def test_validation_deeplink_must_be_catalog_value() -> None:
     plan = _valid_plan()
     plan["contexts"][0]["actions"][0]["stepGroups"][0]["validationDeeplink"] = {
-        "deeplink": "bixby://masked/not-a-validation-uri",
+        "deeplink": "test://masked/not-a-validation-uri",
         "key": "Battery",
     }
     assert _result(plan).valid is False

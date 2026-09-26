@@ -109,13 +109,13 @@ def test_unrelated_query_is_refused(builder, siis_rows):
     assert builder.build("best pasta recipe", siis["content"], siis["title"]) is None
 
 
-def test_unindexed_settings_screen_uses_the_placeholder(builder):
+def test_unindexed_settings_screen_uses_the_placeholder(builder, catalog_by_id):
     build = builder.build("check storage settings", "## Check storage\nGo to Settings. Tap Storage.", "Storage help")
     assert build is not None and build.errors == ()
     action = build.response["contexts"][0]["actions"][0]
     link = action["stepGroups"][0]["actionableDeeplink"]
     assert action["category"] == "auto"
-    assert link["deeplink"] == "bixby://dummy_positive"
+    assert link["deeplink"] == catalog_by_id["DL-DUMMY"]["deeplink"]
     assert link["description"] == "Opens the Storage Settings screen"
     assert link["message"] == "Open the Storage screen in Settings"
 

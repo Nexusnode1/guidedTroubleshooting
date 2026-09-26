@@ -13,7 +13,7 @@ export interface SimScreen {
 
 const VERB_PREFIX = /^(?:view|enables?|disables?|adjust|increase|check|opens?|sets?)\s+(?:the\s+)?/i;
 
-/** Pure model of what a deeplink does on a Galaxy Settings screen. The URI is carried, never navigated to. */
+/** Pure model of what a deeplink does on a device Settings screen. The URI is carried, never navigated to. */
 export function openDeeplink(link: ActionableDeeplink, validation?: ValidationDeeplink | null): SimScreen {
   const type = link.originalType ?? "";
   const title = (link.message || link.description).replace(VERB_PREFIX, "").trim() || "Settings";

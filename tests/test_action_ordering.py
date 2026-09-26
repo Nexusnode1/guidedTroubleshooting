@@ -84,7 +84,7 @@ def test_dummy_positive_fallback_is_standard_only_for_settings_context() -> None
     action = {
         "message": "Open the relevant Settings screen",
         "description": "Generic Settings screen fallback",
-        "deeplink": "bixby://dummy_positive",
+        "deeplink": "test://dummy_positive",
         "originalType": "placeholder",
     }
     decision = order_actions([action])[0]

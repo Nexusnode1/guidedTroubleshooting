@@ -170,16 +170,21 @@ class PlanCache:
         ranked = sorted(best_per_entry.items(), key=lambda pair: pair[1], reverse=True)[:k]
         return [CacheHit(self._entries[entry_id], round(score, 4), False) for entry_id, score in ranked]
 
-    def save(self, path: Path) -> None:
-        """Write all entries to ``path`` as JSON."""
+    def save(self, path: Path, source: str | None = None) -> None:
+        """Write all entries to ``path`` as JSON, with the ``source`` fingerprint they were built from."""
         path.parent.mkdir(parents=True, exist_ok=True)
-        payload = {
-            "entries": [
+        payload: dict[str, Any] = {} if source is None else {"source": source}
+        payload["entries"] = [
                 {"id": e.entry_id, "query": e.query, "variations": list(e.variations), "response": e.response}
                 for e in self._entries.values()
             ]
-        }
         path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+
+    @staticmethod
+    def stored_source(path: Path) -> str | None:
+        """Return the source fingerprint saved with a cache file, or ``None`` if it has none."""
+        source = json.loads(path.read_text(encoding="utf-8")).get("source")
+        return source if isinstance(source, str) else None
 
     @classmethod
     def load(cls, path: Path, catalog: Iterable[Mapping[str, Any]], **kwargs: Any) -> "PlanCache":

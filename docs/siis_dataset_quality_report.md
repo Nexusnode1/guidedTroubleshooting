@@ -28,18 +28,18 @@ revisions caught not by manual review but by actually running the pipeline (`row
 article vocabulary and re-verified). Five representative examples, with the rule each one
 broke:
 
-1. **Row 1** (Email server). Rejected: *"My Galaxy screen flashes and goes blank whenever I
+1. **Row 1** (Email server). Rejected: *"My Nexa screen flashes and goes blank whenever I
    check my email."* -- reintroduces the original unsupported display symptom the article
    never addresses (rules A/E: wrong intent, new unsupported cause).
-2. **Row 5** (Smart Switch transfer). Rejected: *"My screen goes blank every time I try to
-   scan a QR code with Smart Switch."* -- reintroduces "blank screen" as a QR-scan blocker,
+2. **Row 5** (Data Transfer). Rejected: *"My screen goes blank every time I try to
+   scan a QR code with Data Transfer."* -- reintroduces "blank screen" as a QR-scan blocker,
    a failure mode the article never discusses; it only explains the normal working flow
    (rule E: no new cause).
 3. **Row 8** (Screen mirroring). Rejected: *"My phone's screen is small and won't fill the
    display."* -- drops the TV-mirroring context the article requires, making it
    indistinguishable from an on-device sizing problem the article does not cover (rule D:
    same context).
-4. **Row 12** (Multi Window / Edge panel). Rejected: *"How do I remove the floating
+4. **Row 12** (Multi Window / Quick Access panel). Rejected: *"How do I remove the floating
    navigation circle from my screen?"* -- this is verbatim the original unsupported entity
    (an Assistant-Menu-style floating shortcut); Multi Window never discusses one (rule A/E).
 5. **Row 20** (Screen rotation). Rejected: *"My screen colors look distorted and washed
@@ -49,8 +49,8 @@ broke:
 ## 8. Domain/category coverage
 
 All 20 rows fall within the PDF's "Display" domain; the 11 unique classes are: Email
-connectivity, Blank/black display (6 rows), Data-access-when-unresponsive (3 rows), Smart
-Switch transfer, Multi Window/App pairs (2 rows), Screen mirroring, Camera video flicker,
+connectivity, Blank/black display (6 rows), Data-access-when-unresponsive (3 rows), Data
+Transfer (Secure folder), Multi Window/App pairs (2 rows), Screen mirroring, Camera video flicker,
 Cracked/bleeding screen (2 rows), Screen rotation, Touchscreen issues. Battery, Camera
 (device-level, not just video flicker), and Performance are not represented in the official
 20 rows at all -- a pre-existing, separately documented gap (`docs/domain-coverage.md`),
@@ -58,9 +58,9 @@ out of scope for this task, which only audits and corrects the official rows as 
 
 ## 9. Remaining ambiguous rows
 
-- **row_17**: an unmodified, genuinely ALIGNED query that still fails the live app's lexical
-  relevance gate, exactly as it did before this audit. Left untouched rather than reworded
-  to game an unrelated heuristic; documented as a pipeline limitation, not a dataset defect.
+- **row_17**: an unmodified, genuinely ALIGNED query. Under the earlier wording of the
+  official data it failed the live app's lexical relevance gate; with the current official
+  wording it passes and builds a valid plan. It was never reworded to game the heuristic.
 - **row_5**: the reframing (from "screen blank during QR scan" to "QR transfer not
   completing") is a reasonable but debatable choice of which real, article-supported failure
   mode best preserves the original complaint's spirit.
@@ -86,18 +86,19 @@ produced a credible and informative result:
 
 | Split | N | Recall@1 | Recall@3 | Recall@5 | MRR |
 | --- | --- | --- | --- | --- | --- |
-| val | 32 | 75.0% | 96.9% | 96.9% | 0.833 |
-| test | 55 | 87.3% | 100% | 100% | 0.936 |
+| val | 32 | 78.1% | 93.8% | 93.8% | 0.844 |
+| test | 64 | 89.1% | 100% | 100% | 0.940 |
 
-(Test N is 55, not 64, because `row_17`'s 9 texts are excluded -- there is no valid target
-plan to score against for a gated row.) Schema/rule validation pass rate: 95% (19/20).
-Exact deeplink accuracy and auto-action screen-resolution rate (catalog membership): 100%.
+No texts are excluded: every row builds a valid plan. Schema/rule validation pass rate: 100%
+(20/20). Exact deeplink accuracy and auto-action screen-resolution rate (catalog membership):
+100%.
 
 The one real, reproducible failure mode found is `row_19` (Cracked/bleeding screen,
-held-out): its canonical query and 5 of its 6 remaining paraphrases were retrieved as
-"Access phone's data" or "Device issue" instead, because its multi-symptom wording ("touch
+held-out): 6 of its 9 test texts (its canonical query and 5 of its 8 paraphrases) were
+retrieved as "Access smartphone's data" instead, because its multi-symptom wording ("touch
 doesn't work," "can hardly see anything") genuinely overlaps with that other class's
-vocabulary. This is documented as the top hard negative in `docs/siis_hard_negatives.md`.
+vocabulary. The only other test miss is `row_17`'s canonical query (retrieved as "Blank
+black display"). This is documented as the top hard negative in `docs/siis_hard_negatives.md`.
 
 ## 12. Remaining data limitations
 
@@ -106,15 +107,15 @@ vocabulary. This is documented as the top hard negative in `docs/siis_hard_negat
   representative of production traffic.
 - Battery, Camera (device-level), and Performance domains are not represented in the
   official data at all (see section 8).
-- The live app's lexical relevance gate (a separate component from this dataset) still has
-  one known false negative (`row_17`). A side benefit of this task: the gate's two
-  previously-documented false positives (rows 7 and 12, `docs/domain-coverage.md`) are now
-  resolved, because those rows' queries were corrected to match articles they genuinely fit.
+- The live app's lexical relevance gate (a separate component from this dataset) is lexical,
+  not semantic; `row_17` failed it under the earlier wording of the official data. A side
+  benefit of this task: the gate's two previously-documented false positives (rows 7 and 12,
+  `docs/domain-coverage.md`) are now resolved, because those rows' queries were corrected to match articles they genuinely fit.
 - `scripts/validate_data.py` is a pre-existing, unrelated bootstrap-era script that checks
   for filenames (`queries.json`, `responses.json`) that were never the actual official
   filenames; it reports them missing regardless of this work and was not touched.
-- Paraphrases are author-written English, not collected from real Samsung customers. They
-  are correctly aligned to real Samsung troubleshooting content (unlike an external intent
+- Paraphrases are author-written English, not collected from real customers. They
+  are correctly aligned to the official SIIS troubleshooting content (unlike an external intent
   dataset, which was not used anywhere in this task), but "aligned and grounded" is not the
   same claim as "collected from the field."
 
@@ -122,27 +123,27 @@ vocabulary. This is documented as the top hard negative in `docs/siis_hard_negat
 
 ### 5 corrected bad queries (before -> after)
 
-1. **row_1**: "My Samsung A115G tablet screen flashes and then goes completely blank
+1. **row_1**: "My TechCorp A15G tablet screen flashes and then goes completely blank
    whenever I tap to open an email in Gmail..." -> "My email keeps saying the server isn't
-   responding and my messages won't load on my Samsung tablet."
-2. **row_8**: "My new Samsung phone's main screen stays small and doesn't fill the whole
-   display..." -> "When I mirror my phone to my Samsung TV with Smart View, the image looks
+   responding and my messages won't load on my tablet."
+2. **row_8**: "My new smartphone's main screen stays small and doesn't fill the whole
+   display..." -> "When I mirror my phone to my TechCorp TV with Smart View, the image looks
    small and doesn't fill the whole TV screen."
-3. **row_12**: "My Galaxy S25 has a floating circle that constantly hovers on my screen and
-   gives me quick shortcuts..." -> "I want to remove an app pair shortcut from the Edge
-   panel on my Galaxy phone."
-4. **row_20**: "My Galaxy A17 screen looks distorted right after I received the phone, and I
-   need a diagnostic test." -> "My Galaxy A17's screen won't rotate to landscape when I turn
+3. **row_12**: "My Nexa X1 has a floating circle that constantly hovers on my screen and
+   gives me quick shortcuts..." -> "I want to remove an app pair shortcut from the Quick
+   Access panel on my smartphone."
+4. **row_20**: "My Nexa A14 screen looks distorted right after I received the phone, and I
+   need a diagnostic test." -> "My Nexa A14's screen won't rotate to landscape when I turn
    the phone sideways."
 5. **row_22**: "...even though the phone powers on, rings, and otherwise works; there is no
-   physical damage." -> "My Galaxy S24 Ultra's screen is completely black and won't turn on,
+   physical damage." -> "My Nexa X1 Ultra's screen is completely black and won't turn on,
    and there's no physical damage to the phone." (drops the self-contradicting "powers on,
    rings, otherwise works" clause; keeps the "no physical damage" detail, which the article
    does address.)
 
 ### 5 high-quality paraphrase groups
 
-**row_10** (canonical: "My Galaxy phone's camera video has a flickering line or band,
+**row_10** (canonical: "My smartphone's camera video has a flickering line or band,
 especially when I record indoors under fluorescent or LED lighting."):
 - "There's a flickering band that shows up in my videos when I film inside under the lights."
 - "My camera footage keeps flickering like a black bar moving across the screen when I record indoors."
@@ -151,20 +152,20 @@ especially when I record indoors under fluorescent or LED lighting."):
 - "Every video I take indoors has this annoying flicker running through it, I can't figure out why."
 - "My camera app produces a strobing artifact in footage captured under artificial indoor lighting."
 
-**row_19** (canonical, ALIGNED/multi-symptom: "My Galaxy Z Flip 7 screen is cracked again
+**row_19** (canonical, ALIGNED/multi-symptom: "My Nexa Fold X1 screen is cracked again
 right at the fold, touch doesn't work on certain parts of the screen, and I can hardly see
 anything on the display."):
 - "My fold screen cracked again, touch is dead in some spots, and I can barely see anything."
 - "This is the second time it's cracked right at the fold, and now touch barely works and I can hardly see anything!"
 - "The panel has fractured again at the hinge, with unresponsive touch zones and degraded visibility."
 
-**row_21** (canonical: "My Galaxy S22 screen inputs are delayed and the touch
+**row_21** (canonical: "My Nexa X1 screen inputs are delayed and the touch
 responsiveness is laggy..."):
 - "My touchscreen feels laggy, there's a delay every time I tap something."
 - "Every tap takes forever to register, this touch delay is driving me crazy."
 - "So my screen just feels really sluggish, like there's always a delay before it reacts to my taps."
 
-**row_14** (canonical, ALIGNED: "My Galaxy phone's screen is completely cracked..."):
+**row_14** (canonical, ALIGNED: "My smartphone's screen is completely cracked..."):
 - "My screen's totally busted, cracked all over, can't do anything with the phone now."
 - "What are my options for repair since my screen is completely cracked?"
 - "So I dropped my phone and now the screen's a total crack, can't really use it like this."

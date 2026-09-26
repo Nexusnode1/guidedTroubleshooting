@@ -88,7 +88,7 @@ def test_cold_build_latency_p95_is_within_8_seconds(service, siis_rows):
 def test_every_cached_plan_is_valid_and_url_free(service, catalog):
     for entry in service.cache.entries():
         assert validate_plan({**entry.response, "query_variations": list(entry.variations)}, catalog).valid
-        assert not URL.search(json.dumps({k: v for k, v in entry.response.items()}).replace("bixby://", ""))
+        assert not URL.search(json.dumps({k: v for k, v in entry.response.items()}))
 
 
 def test_a_model_saved_to_a_local_directory_loads_and_matches(tmp_path):

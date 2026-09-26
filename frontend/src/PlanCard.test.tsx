@@ -5,12 +5,12 @@ import { PlanCard } from "./PlanCard";
 import type { Goal } from "./types";
 
 const link = {
-  deeplink: "bixby://masked/act/14eb42b895",
+  deeplink: "voiceassist://masked/act/14eb42b895",
   description: "Enables touch sensitivity via device Settings on the device.",
   message: "Enable Touch sensitivity",
   originalType: "onURL",
 };
-const validation = { deeplink: "bixby://masked/val/6451858b28", key: "Touch sensitivity", resultType: "boolean", condition: "equal", value: "True" };
+const validation = { deeplink: "voiceassist://masked/val/6451858b28", key: "Touch sensitivity", resultType: "boolean", condition: "equal", value: "True" };
 
 const goal: Goal = {
   goal: "Follow these steps to perform this Touchscreen Issues Troubleshooting",

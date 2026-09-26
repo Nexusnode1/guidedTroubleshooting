@@ -7,7 +7,12 @@ import pytest
 
 from app.retrieval.embeddings import HashEmbeddingModel
 from app.services.plan_cache import PlanCache
-from app.services.troubleshooting_service import MODEL_ID, TroubleshootingService, build_default_service
+from app.services.troubleshooting_service import (
+    MODEL_ID,
+    TroubleshootingService,
+    build_default_service,
+    source_fingerprint,
+)
 
 FIXTURES = json.loads((Path(__file__).parent / "fixtures" / "paraphrases.json").read_text(encoding="utf-8"))
 
@@ -87,3 +92,86 @@ def test_default_service_warms_then_reloads_from_disk(tmp_path):
     second = build_default_service(cache_path=path, embedder=HashEmbeddingModel())
     assert len(second.cache) == len(first.cache)
     assert isinstance(second.cache, PlanCache)
+
+
+def _saved_cache(tmp_path):
+    path = tmp_path / "plan_cache.json"
+    build_default_service(cache_path=path, embedder=HashEmbeddingModel())
+    return path, json.loads(path.read_text(encoding="utf-8"))
+
+
+def _no_warm(monkeypatch):
+    def fail(self, rows):
+        raise AssertionError("a usable cache must be loaded, not rebuilt")
+
+    monkeypatch.setattr(TroubleshootingService, "warm", fail)
+
+
+def test_saved_cache_records_the_source_it_was_built_from(tmp_path, catalog, siis_rows):
+    path, payload = _saved_cache(tmp_path)
+    assert payload["source"] == source_fingerprint(catalog, siis_rows)
+    assert PlanCache.stored_source(path) == payload["source"]
+
+
+def test_matching_cache_is_loaded_without_rebuilding(tmp_path, monkeypatch):
+    path, payload = _saved_cache(tmp_path)
+    _no_warm(monkeypatch)
+    service = build_default_service(cache_path=path, embedder=HashEmbeddingModel())
+    assert len(service.cache) == len(payload["entries"])
+
+
+def test_valid_cache_saved_without_a_fingerprint_is_still_loaded(tmp_path, monkeypatch):
+    path, payload = _saved_cache(tmp_path)
+    del payload["source"]
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    _no_warm(monkeypatch)
+    assert len(build_default_service(cache_path=path, embedder=HashEmbeddingModel()).cache) == len(payload["entries"])
+
+
+def test_cache_from_an_older_catalog_is_rebuilt_instead_of_blocking_startup(tmp_path, catalog):
+    path, payload = _saved_cache(tmp_path)
+    # A cache written against an earlier catalog: same shape, URIs the current catalog lacks.
+    stale = json.loads(json.dumps(payload).replace("voiceassist://", "legacy://"))
+    del stale["source"]
+    path.write_text(json.dumps(stale), encoding="utf-8")
+    service = build_default_service(cache_path=path, embedder=HashEmbeddingModel())
+    assert len(service.cache) == len(payload["entries"])
+    assert "legacy://" not in path.read_text(encoding="utf-8")
+    uris = {entry["deeplink"] for entry in catalog}
+    for entry in service.cache.entries():
+        for action in entry.response["contexts"][0]["actions"]:
+            for group in action["stepGroups"]:
+                link = group["actionableDeeplink"]
+                assert link is None or link["deeplink"] in uris
+
+
+def test_cache_built_from_other_source_data_is_rebuilt(tmp_path):
+    path, payload = _saved_cache(tmp_path)
+    payload["source"] = "0" * 64
+    payload["entries"] = payload["entries"][:1]
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    service = build_default_service(cache_path=path, embedder=HashEmbeddingModel())
+    assert len(service.cache) > 1
+    assert PlanCache.stored_source(path) != "0" * 64
+
+
+@pytest.mark.parametrize("content", ["{not json", "[]", '{"entries": [{"id": "x"}]}'])
+def test_unreadable_cache_file_is_rebuilt(tmp_path, content):
+    path = tmp_path / "plan_cache.json"
+    path.write_text(content, encoding="utf-8")
+    service = build_default_service(cache_path=path, embedder=HashEmbeddingModel())
+    assert len(service.cache) >= 12
+    assert PlanCache.stored_source(path) is not None
+
+
+def test_api_starts_and_is_healthy_with_a_stale_cache_on_disk(tmp_path, monkeypatch):
+    from fastapi.testclient import TestClient
+
+    import app.main as main
+
+    path, payload = _saved_cache(tmp_path)
+    path.write_text(json.dumps(payload).replace("voiceassist://", "legacy://"), encoding="utf-8")
+    original = main.build_default_service
+    monkeypatch.setattr(main, "build_default_service", lambda: original(cache_path=path, embedder=HashEmbeddingModel()))
+    with TestClient(main.app) as client:
+        assert client.get("/health").json() == {"status": "ok"}

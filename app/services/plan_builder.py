@@ -12,9 +12,10 @@ import re
 from typing import Any
 
 from app.services.action_ordering import ordered_values
-from app.services.key_matcher import DUMMY_URI, KeyIndex, tap_targets
+from app.services.key_matcher import KeyIndex, tap_targets
 from app.services.plan_validator import validate_plan
-from app.services.relevance import relevance
+from app.services.catalog import load_siis_rows
+from app.services.relevance import common_tokens, relevance
 from app.services.siis_parser import Section, embedded_title, is_imperative, parse_sections
 from app.services.variations import generate_variations
 
@@ -28,7 +29,7 @@ _CRITICAL = re.compile(
 _SETTINGS = re.compile(r"(?<!Quick )\bSettings\b")
 _STOPWORDS = frozenset("a an the your my to of on for with in and or is are".split())
 _TOPIC_STOP = _STOPWORDS | frozenset(
-    "some things check first how use you can cannot samsung galaxy phone tablet".split()
+    "some things check first how use you can cannot phone tablet".split()
 )
 _TOPIC_CUT = re.compile(r"\s+(?:on|when|in|for|if|not|does|do|is|are)\s+|\(")
 _VALIDATION_FIELDS = ("deeplink", "key", "resultType", "condition", "value")
@@ -56,9 +57,9 @@ def _base(heading: str, steps: list[str]) -> str:
     return _SPLIT_NAME.split(heading)[0].strip() or " ".join(steps[0].split()[:4])
 
 
-def _topic(title: str) -> str:
+def _topic(title: str, common: frozenset[str] = frozenset()) -> str:
     head = _TOPIC_CUT.split(title)[0]
-    words = [w for w in _words(head) if w.lower() not in _TOPIC_STOP][:3]
+    words = [w for w in _words(head) if w.lower() not in _TOPIC_STOP and w.lower() not in common][:3]
     return " ".join(_cap(w) for w in words) or "Device Issue"
 
 
@@ -96,12 +97,12 @@ def _validation_link(entry: Mapping[str, Any]) -> dict[str, Any] | None:
     return {field: validation[field] for field in _VALIDATION_FIELDS if field in validation}
 
 
-def _placeholder_link(label: str) -> dict[str, Any]:
+def _placeholder_link(placeholder: Mapping[str, Any], label: str) -> dict[str, Any]:
     return {
-        "deeplink": DUMMY_URI,
+        "deeplink": placeholder["deeplink"],
         "description": f"Opens the {label} Settings screen",
         "message": f"Open the {label} screen in Settings",
-        "originalType": "placeholder",
+        "originalType": placeholder["originalType"],
     }
 
 
@@ -131,9 +132,9 @@ def _build_action(section: Section, index: KeyIndex) -> dict[str, Any] | None:
         if choice is not None:
             group["actionableDeeplink"] = _catalog_link(choice.entry)
             group["validationDeeplink"] = _validation_link(choice.entry)
-        else:
+        elif index.placeholder is not None:
             label = " ".join(next(iter(reversed(tap_targets(steps))), "relevant").split()[:2])
-            group["actionableDeeplink"] = _placeholder_link(label)
+            group["actionableDeeplink"] = _placeholder_link(index.placeholder, label)
     else:
         category = "manual"
     return {
@@ -162,12 +163,22 @@ def _merge_same_screen(actions: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return merged
 
 
-class PlanBuilder:
-    """Turn (query, SIIS text) into a validated plan or refuse."""
+def _official_articles() -> list[str]:
+    return [row["siis_response"]["content"] for row in load_siis_rows()]
 
-    def __init__(self, catalog: Iterable[Mapping[str, Any]]) -> None:
+
+class PlanBuilder:
+    """Turn (query, SIIS text) into a validated plan or refuse.
+
+    ``corpus`` is the knowledge base the relevance gate measures word frequency against
+    (the official SIIS articles by default): words common to most of it, such as vendor
+    and product-family names, are not counted as evidence that a query fits an article.
+    """
+
+    def __init__(self, catalog: Iterable[Mapping[str, Any]], corpus: Iterable[str] | None = None) -> None:
         self.catalog = list(catalog)
         self._index = KeyIndex(self.catalog)
+        self.common_words = common_tokens(_official_articles() if corpus is None else corpus)
 
     def build(self, query: str, content: str, title: str = "") -> PlanBuild | None:
         """Return a plan, or ``None`` when the text has no usable, relevant steps.
@@ -181,13 +192,13 @@ class PlanBuilder:
         title = title or embedded_title(content) or ""
         sections = parse_sections(content, title)
         article = " ".join(f"{s.heading} {s.body}" for s in sections)
-        score = relevance(query, article, title)
+        score = relevance(query, article, title, self.common_words)
         if score <= 0.0:
             return None
         actions = [a for s in sections if (a := _build_action(s, self._index)) is not None]
         if not actions:
             return None
-        topic = _topic(title or sections[0].heading)
+        topic = _topic(title or sections[0].heading, self.common_words)
         response = {
             "contexts": [
                 {

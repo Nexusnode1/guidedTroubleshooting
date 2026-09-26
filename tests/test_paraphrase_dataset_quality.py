@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 # Rows the audit found MISALIGNED with their article and corrected. A regression here means
 # the correction was undone or weakened back toward the original unsupported wording.
-KNOWN_GATED_ROWS = {"row_17"}  # aligned, unmodified query; a pre-existing lexical-gate limitation
+KNOWN_GATED_ROWS: set[str] = set()  # row_17 no longer trips the lexical gate with the current official wording
 
 
 def _load_builder():
@@ -136,11 +136,11 @@ def test_corrected_canonical_queries_drop_the_original_unsupported_wording(rows_
 @pytest.mark.parametrize(
     "row_id, required_word",
     [
-        ("row_5", "smart switch"),  # kept: the article's real domain
+        ("row_5", "data transfer"),  # kept: the article's real domain
         ("row_8", "tv"),  # reframed into the mirroring context the article supports
         ("row_8", "mirror"),
         ("row_10", "camera"),  # reframed into the camera-flicker context the article supports
-        ("row_12", "edge panel"),  # reframed into the Multi Window article's own remove-shortcut section
+        ("row_12", "quick access panel"),  # reframed into the Multi Window article's own remove-shortcut section
         ("row_20", "rotate"),  # reframed into the rotation-lock context the article supports
     ],
 )

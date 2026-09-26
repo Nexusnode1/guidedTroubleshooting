@@ -90,7 +90,7 @@ export default function App() {
     <div className="app">
       <main className="chat">
         <header className="chat__head">
-          <h1>Galaxy Troubleshooter</h1>
+          <h1>Device Troubleshooter</h1>
           <p>Describe what's wrong in your own words. You'll get an ordered plan you can open step by step.</p>
         </header>
 

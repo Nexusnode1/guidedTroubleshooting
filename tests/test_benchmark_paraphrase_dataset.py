@@ -1,10 +1,9 @@
 """Regression tests for scripts/benchmark_paraphrase_dataset.py's exclusion accounting.
 
-Guards the discrepancy found between the dataset's split_counts (64 test texts) and the
-benchmark's reported N (55): a row with no valid plan has no target title to score retrieval
-against and is excluded, not silently dropped. These tests fail if that accounting ever stops
-adding up, or if the specific known exclusion (row_17, the pre-existing lexical relevance-gate
-limitation) changes without anyone noticing.
+A row with no valid plan has no target title to score retrieval against and is excluded,
+not silently dropped (row_17 once was, which made the benchmark's N differ from the dataset's
+split_counts). These tests fail if that accounting ever stops adding up, or if any row starts
+being excluded without anyone noticing.
 """
 
 from __future__ import annotations
@@ -45,18 +44,14 @@ def test_every_split_texts_dataset_size_equals_scored_plus_excluded(benchmark, d
         assert scored + len(excluded) == size, split
 
 
-def test_the_only_currently_excluded_examples_are_row_17s_nine_test_texts(dataset, benchmark):
-    """Locks in the specific, already-documented reason for the N=64-vs-55 discrepancy
-    (docs/siis_alignment_audit.md, docs/siis_paraphrase_baseline_benchmark.md). If this
-    starts failing, a *different* row has started failing its plan build -- investigate,
-    do not just widen this test to accept it."""
-    val_excluded = benchmark.excluded_examples(dataset, "val")
-    test_excluded = benchmark.excluded_examples(dataset, "test")
-    assert val_excluded == []
-    assert {item["row_id"] for item in test_excluded} == {"row_17"}
-    assert len(test_excluded) == 9
-    for item in test_excluded:
-        assert "gated" in item["reason"]
+def test_no_examples_are_currently_excluded(dataset, benchmark):
+    """row_17 used to be the only exclusion (its query failed the lexical relevance gate;
+    see docs/siis_alignment_audit.md). With the current official wording it shares the same
+    two words with its article out of fewer query words, so it now builds a valid plan and
+    nothing is excluded. If this starts failing, a row has started failing its plan build --
+    investigate, do not just widen this test to accept it."""
+    assert benchmark.excluded_examples(dataset, "val") == []
+    assert benchmark.excluded_examples(dataset, "test") == []
 
 
 def test_dataset_reports_180_texts_split_84_32_64_before_any_exclusion(dataset, benchmark):

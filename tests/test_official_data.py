@@ -6,13 +6,23 @@ import pytest
 
 from app.config import ORIGINAL_DIR
 from app.models.official_schema import ContextDeeplinkResponse
+from app.services.catalog import is_placeholder
 
 OFFICIAL_FILES = ("deeplinks.json", "siis_responses.json", "input.txt", "sample_output.json")
 
 
 def test_catalog_has_official_entry_count_and_one_placeholder(catalog):
     assert len(catalog) == 578
-    assert sum(entry["deeplink"] == "bixby://dummy_positive" for entry in catalog) == 1
+    placeholders = [entry for entry in catalog if is_placeholder(entry)]
+    assert [entry["deeplink"] for entry in placeholders] == ["voiceassist://dummy_positive"]
+
+
+def test_every_catalog_uri_uses_the_official_namespace(catalog):
+    for entry in catalog:
+        assert entry["deeplink"].startswith("voiceassist://"), entry["id"]
+        validation = entry.get("validation")
+        if validation:
+            assert validation["deeplink"].startswith("voiceassist://"), entry["id"]
 
 
 def test_siis_rows_are_the_twenty_official_rows(siis_rows):

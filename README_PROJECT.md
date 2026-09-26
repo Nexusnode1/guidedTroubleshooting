@@ -4,7 +4,7 @@ Samsung PRISM hackathon submission, Theme 2 ("Smart Guided Troubleshooting Engin
 
 ## Problem
 
-A user describes a Galaxy problem in their own vague words ("touch is laggy", "screen is
+A user describes a device problem in their own vague words ("touch is laggy", "screen is
 cracked") instead of the exact wording of a support article. The engine has to turn that into
 an ordered, step-by-step plan built only from verified content -- with no hallucinated steps,
 no invented deeplinks, and no fabricated Settings screens -- fast enough to feel instant on a
@@ -193,14 +193,17 @@ here is estimated or extrapolated. Full detail and methodology in the linked doc
 
 | Metric | Value | Scope | Source |
 | --- | --- | --- | --- |
-| Schema-valid output / deeplink catalog validity / URL leaks | 100% / 100% / 0 | 17 plans from the 20 official rows | `metrics.md` |
+| Schema-valid output / deeplink catalog validity / URL leaks | 100% / 100% / 0 | 18 plans from the 20 official rows | `metrics.md` |
 | Fast-Path cache, exact repeat, P95 | 1.2 ms | **local process** (not Docker) | `docs/docker_latency_benchmark.md` |
 | Fast-Path cache, unseen paraphrase, P95 | 33.8 ms | **local process** (not Docker) | `docs/docker_latency_benchmark.md` |
 | Cold path (siis_response supplied), P95 | 286.9 ms | **local process** (not Docker) | `docs/docker_latency_benchmark.md` |
 | Semantic cache **hit rate** (engaged fast path vs. fell back) | 98.28% (57/58) | local process, official + held-out paraphrases | `docs/docker_latency_benchmark.md` |
-| Semantic cache **hit correctness** (unseen paraphrase -> correct plan) | 89.3% (25/28) | official held-out paraphrase sets | `metrics.md` |
-| Retrieval accuracy, Recall@1 | 87.3% (test) / 75.0% (val) | official-data paraphrase dataset, no fine-tuning | `docs/siis_paraphrase_baseline_benchmark.md` |
+| Semantic cache **hit correctness** (unseen paraphrase -> correct plan) | 85.7% (24/28) | official held-out paraphrase sets | `metrics.md` |
+| Retrieval accuracy, Recall@1 | 89.1% (test) / 78.1% (val) | official-data paraphrase dataset, no fine-tuning | `docs/siis_paraphrase_baseline_benchmark.md` |
 | Retrieval accuracy, Recall@1 | 98.75% combined | **SYNTHETIC** Battery/Camera/Performance fixture (16 articles, 80 paraphrases) -- not production-scale evidence | `docs/cross_domain_generalization.md` |
+
+The four `docs/docker_latency_benchmark.md` rows were measured on the previous version of the
+official data and have not been re-run against the current reference set; the other rows were.
 
 "Hit rate" (did the fast path engage at all) and "hit correctness" (was the plan it returned the
 right one) are different measurements, kept separate above on purpose -- a high hit rate with a
@@ -235,9 +238,11 @@ Do not present the numbers above as Docker-container performance.
   there. Detail in `docs/cross_domain_generalization.md`.
 - **Docker runtime verification pending**: see "Docker status" above -- build/run success and
   container latency remain unverified in this environment.
-- The lexical relevance gate occasionally refuses a genuinely aligned query (official `row_17`)
-  and occasionally accepts a loosely-related one (rows 7, 12) -- it matches on shared ordinary
-  words, not meaning; see `metrics.md` section 6 and `docs/siis_alignment_audit.md`.
+- The lexical relevance gate can refuse a genuinely aligned query (official `row_17` was refused
+  under the earlier wording of the official data) and occasionally accepts a loosely-related one
+  (rows 7, 12) -- it matches on shared ordinary words, not meaning. Words common to most of the
+  official articles (vendor and product-family names) are not counted as a match; see
+  `app/services/relevance.py`, `metrics.md` section 6 and `docs/siis_alignment_audit.md`.
 
 ## Your own model later
 

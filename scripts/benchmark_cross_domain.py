@@ -28,13 +28,13 @@ sys.path.insert(0, str(ROOT))
 
 from app.config import EMBEDDING_MODEL  # noqa: E402
 from app.retrieval.st_embedder import load_embedder  # noqa: E402
-from app.services.catalog import load_catalog  # noqa: E402
+from app.services.catalog import load_catalog, placeholder_uris  # noqa: E402
 from app.services.plan_cache import PlanCache  # noqa: E402
 from app.services.troubleshooting_service import TroubleshootingService  # noqa: E402
 
 FIXTURE_PATH = ROOT / "tests" / "fixtures" / "cross_domain_articles.json"
 K_VALUES = (1, 3, 5)
-DUMMY = "bixby://dummy_positive"
+DUMMY_URIS = placeholder_uris(load_catalog())
 
 
 def load_fixture() -> dict[str, Any]:
@@ -66,7 +66,7 @@ def run_cold_pipeline(service: TroubleshootingService, catalog_ids: dict[str, st
                 if not link:
                     continue
                 record["resolved_deeplink_ids"].append(
-                    "PLACEHOLDER" if link["deeplink"] == DUMMY else catalog_ids.get(link["deeplink"], "UNKNOWN")
+                    "PLACEHOLDER" if link["deeplink"] in DUMMY_URIS else catalog_ids.get(link["deeplink"], "UNKNOWN")
                 )
     real_hits = {d for d in record["resolved_deeplink_ids"] if d not in ("PLACEHOLDER", "UNKNOWN")}
     expected = set(article["expected_deeplink_ids"])
@@ -106,7 +106,7 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
 def main() -> int:
     fixture = load_fixture()
     catalog = load_catalog()
-    catalog_ids = {e["deeplink"]: e["id"] for e in catalog if e["id"] != "DL-DUMMY"}
+    catalog_ids = {e["deeplink"]: e["id"] for e in catalog if e["deeplink"] not in DUMMY_URIS}
     service = TroubleshootingService(catalog, PlanCache(catalog, model=load_embedder(EMBEDDING_MODEL)))
 
     pipeline_records = [run_cold_pipeline(service, catalog_ids, article) for article in fixture["articles"]]

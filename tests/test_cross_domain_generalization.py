@@ -14,13 +14,12 @@ import re
 import pytest
 
 from app.retrieval.embeddings import HashEmbeddingModel
-from app.services.catalog import load_catalog
+from app.services.catalog import load_catalog, placeholder_uris
 from app.services.plan_cache import PlanCache
 from app.services.troubleshooting_service import TroubleshootingService
 
 FIXTURE = json.loads((Path(__file__).parent / "fixtures" / "cross_domain_articles.json").read_text(encoding="utf-8"))
 DOMAINS = {"Battery", "Camera", "Performance"}
-DUMMY = "bixby://dummy_positive"
 URL = re.compile(r"https?://|www\.", re.IGNORECASE)
 KNOWN_LIMITATIONS: set[str] = set()  # performance_want_scheduled_restart was fixed; see plan_builder._build_action
 
@@ -70,7 +69,7 @@ def test_no_deeplink_is_modified_from_its_catalog_value(article, cold_results, c
     for action in context["actions"]:
         for group in action["stepGroups"]:
             link = group["actionableDeeplink"]
-            if link and link["deeplink"] != DUMMY:
+            if link and link["deeplink"] not in placeholder_uris(catalog_by_id.values()):
                 catalog_entry = next(e for e in catalog_by_id.values() if e["deeplink"] == link["deeplink"])
                 assert link["description"] == catalog_entry["description"]
                 assert link["message"] == (catalog_entry.get("message") or "")
@@ -78,7 +77,7 @@ def test_no_deeplink_is_modified_from_its_catalog_value(article, cold_results, c
 
 @pytest.mark.parametrize("article", FIXTURE["articles"], ids=lambda a: a["fixture_id"])
 def test_no_http_or_https_urls_appear_anywhere_in_the_output(article, cold_results):
-    text = json.dumps(cold_results[article["fixture_id"]]["response"]).replace("bixby://", "")
+    text = json.dumps(cold_results[article["fixture_id"]]["response"])
     assert not URL.search(text)
 
 
@@ -95,13 +94,14 @@ def test_manual_actions_never_carry_an_actionable_deeplink(article, cold_results
 def test_every_resolved_deeplink_matches_a_verified_expected_id_or_is_a_known_limitation(article, cold_results, catalog):
     if article["fixture_id"] in KNOWN_LIMITATIONS:
         pytest.skip("documented, deliberately-unfixed limitation; see key_matcher.find()")
-    catalog_ids = {e["deeplink"]: e["id"] for e in catalog if e["id"] != "DL-DUMMY"}
+    dummy = placeholder_uris(catalog)
+    catalog_ids = {e["deeplink"]: e["id"] for e in catalog if e["deeplink"] not in dummy}
     context = cold_results[article["fixture_id"]]["response"]["contexts"][0]
     resolved = set()
     for action in context["actions"]:
         for group in action["stepGroups"]:
             link = group["actionableDeeplink"]
-            if link and link["deeplink"] != DUMMY:
+            if link and link["deeplink"] not in dummy:
                 resolved.add(catalog_ids[link["deeplink"]])
     expected = set(article["expected_deeplink_ids"])
     if expected:

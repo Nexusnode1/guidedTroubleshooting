@@ -17,8 +17,8 @@ const plan = {
         category: "auto",
         stepGroups: [{
           steps: ["Go to Settings.", "Tap Display."],
-          actionableDeeplink: { deeplink: "bixby://masked/act/14eb42b895", description: "d", message: "Enable Touch sensitivity", originalType: "onURL" },
-          validationDeeplink: { deeplink: "bixby://masked/val/6451858b28", key: "Touch sensitivity" },
+          actionableDeeplink: { deeplink: "voiceassist://masked/act/14eb42b895", description: "d", message: "Enable Touch sensitivity", originalType: "onURL" },
+          validationDeeplink: { deeplink: "voiceassist://masked/val/6451858b28", key: "Touch sensitivity" },
         }],
       }],
     }],

@@ -9,25 +9,26 @@ is the input to that decision, not a training run.
 ## Article/intent-level pairs (confirmed by the baseline benchmark)
 
 1. **"Blank or black display" (device won't power on) vs "Some things to check first" /
-   "Access your Galaxy phone's data" (screen unresponsive, focus on data recovery).**
+   "Access your smartphone's data" (screen unresponsive, focus on data recovery).**
    Both share "screen," "black," "doesn't respond" vocabulary; the actual remedy differs
-   (force-restart/charge vs USB-mouse data access). Empirically confirmed: in the baseline
-   run, `row_22` ("The display remains entirely unlit and unresponsive despite no signs of
-   physical damage") was retrieved as "Access phone's data" instead of "Blank black
-   display" -- the exact confusion this pair predicts.
-2. **"Cracked or bleeding screen" vs "Access your Galaxy phone's data."** A multi-symptom
+   (force-restart/charge vs USB-mouse data access). Empirically confirmed: in the current
+   baseline run, `row_17`'s canonical query ("...screen goes completely blank, just a dark
+   screen with occasional scrolling...") was retrieved as "Blank black display" instead of
+   "Device issue" (the "Some things to check first" article) -- the exact confusion this pair
+   predicts.
+2. **"Cracked or bleeding screen" vs "Access your smartphone's data."** A multi-symptom
    crack complaint that also mentions touch not working and poor visibility (`row_19`) shares
    real vocabulary with the "screen doesn't respond, need to recover data" class. Empirically
-   confirmed: the baseline run misretrieved `row_19`'s canonical query and 5 of its 6
-   remaining paraphrases as "Access phone's data" or "Device issue," its only correct hit
-   being one very literal paraphrase. This is the single largest source of test-split misses
-   in the baseline benchmark.
+   confirmed: the baseline run misretrieved 6 of `row_19`'s 9 test texts (its canonical query
+   and 5 of its 8 paraphrases) as "Access smartphone's data"; the other 3 were retrieved
+   correctly. This is the single largest source of test-split misses in the baseline
+   benchmark (6 of its 7 test misses).
 3. **"Blank or black display" vs "Screen flickers when using the Camera."** Both
    keyword-share "screen"; root cause and remedy are unrelated (power/hardware vs
    camera/lighting). Not yet observed as a live confusion in the small held-out set, but the
    vocabulary overlap is real and worth a held-out probe once more paraphrases exist.
-4. **"Touchscreen issues" (touch lag while the display works) vs "Access your Galaxy
-   phone's data" (touch completely unresponsive and/or display invisible).** Overlapping
+4. **"Touchscreen issues" (touch lag while the display works) vs "Access your
+   smartphone's data" (touch completely unresponsive and/or display invisible).** Overlapping
    vocabulary ("touch," "doesn't work"), different severity and different remedy.
 5. **Coverage gaps found by the audit, not confusable pairs to train against:** the
    original `row_12` (floating Assistant-Menu-style shortcut) and `row_20` (visual
@@ -54,5 +55,5 @@ gate's false positives on rows 7 and 12).
 ## Using these later
 
 When fine-tuning starts (not yet), pair 2 above (Cracked/bleeding vs Access-data) is the
-highest-priority hard negative: it is the only one with direct empirical failures in the
-baseline benchmark, not just a hypothesized risk.
+highest-priority hard negative: it accounts for 6 of the 7 test-split misses in the baseline
+benchmark. Pair 1 accounts for the remaining one; the other pairs are hypothesized risks.

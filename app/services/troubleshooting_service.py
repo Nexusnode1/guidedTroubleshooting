@@ -5,6 +5,8 @@ from __future__ import annotations
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 import hashlib
+import json
+import logging
 from pathlib import Path
 import re
 import time
@@ -22,6 +24,8 @@ MODEL_ID = "rules-v1"
 DEFAULT_CACHE_PATH = PROCESSED_DIR / "plan_cache.json"
 _GOAL_TOPIC = re.compile(r"perform this (.+) (?:Troubleshooting|Configuration)$")
 _DEFAULT_TOPIC = "device issue"
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -94,6 +98,31 @@ class TroubleshootingService:
         return empty, generate_variations(query, _DEFAULT_TOPIC), False, fallback
 
 
+def source_fingerprint(catalog: Iterable[Mapping[str, Any]], rows: Iterable[Mapping[str, Any]]) -> str:
+    """Hash the catalog and SIIS rows a cache is built from, so a cache from other data is detected."""
+    payload = json.dumps([MODEL_ID, list(catalog), list(rows)], sort_keys=True, ensure_ascii=False)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def _load_saved_cache(
+    path: Path, catalog: list[Mapping[str, Any]], model: EmbeddingModel, source: str
+) -> PlanCache | None:
+    """Load a saved cache, or return ``None`` when it is stale, unreadable, or fails validation.
+
+    A cache saved with a different source fingerprint was built from other catalog/SIIS data.
+    A cache without a fingerprint (older format) is kept only if every entry still validates.
+    """
+    try:
+        stored = PlanCache.stored_source(path)
+        if stored is not None and stored != source:
+            logger.warning("Plan cache %s was built from different source data; rebuilding it", path)
+            return None
+        return PlanCache.load(path, catalog, model=model)
+    except (OSError, ValueError, KeyError, TypeError, AttributeError) as exc:
+        logger.warning("Plan cache %s is unusable (%s); rebuilding it", path, exc)
+        return None
+
+
 def build_default_service(
     cache_path: Path | None = None,
     rebuild: bool = False,
@@ -101,14 +130,18 @@ def build_default_service(
 ) -> TroubleshootingService:
     """Load the saved cache, or warm it from the official SIIS rows and save it.
 
+    A saved cache built from other source data, or one that no longer passes validation,
+    is rebuilt from the official rows instead of stopping startup.
     ``embedder`` defaults to the model named by ``EMBEDDING_MODEL`` (see app/config.py).
     """
     path = cache_path or DEFAULT_CACHE_PATH
     catalog = load_catalog()
+    rows = load_siis_rows()
+    source = source_fingerprint(catalog, rows)
     model = embedder or load_embedder(EMBEDDING_MODEL)
-    cache = PlanCache.load(path, catalog, model=model) if path.exists() and not rebuild else PlanCache(catalog, model=model)
-    service = TroubleshootingService(catalog, cache)
+    cache = _load_saved_cache(path, catalog, model, source) if path.exists() and not rebuild else None
+    service = TroubleshootingService(catalog, cache or PlanCache(catalog, model=model))
     if len(service.cache) == 0:
-        service.warm(load_siis_rows())
-        service.cache.save(path)
+        service.warm(rows)
+        service.cache.save(path, source)
     return service

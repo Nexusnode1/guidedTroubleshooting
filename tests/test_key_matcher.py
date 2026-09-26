@@ -2,7 +2,8 @@
 
 import pytest
 
-from app.services.key_matcher import DUMMY_URI, KeyIndex, normalize_label, tap_targets
+from app.services.catalog import is_placeholder
+from app.services.key_matcher import KeyIndex, normalize_label, tap_targets
 
 
 def test_tap_targets_skip_the_settings_root():
@@ -65,7 +66,13 @@ def test_unindexed_labels_do_not_match(index):
 def test_the_placeholder_is_never_a_match(index, catalog):
     for entry in catalog:
         choice = index.find([f"Tap {entry.get('message') or 'Nothing'}."], "")
-        assert choice is None or choice.entry["deeplink"] != DUMMY_URI
+        assert choice is None or not is_placeholder(choice.entry)
+
+
+def test_the_placeholder_is_taken_from_the_catalog(index, catalog):
+    placeholders = [entry for entry in catalog if is_placeholder(entry)]
+    assert len(placeholders) == 1
+    assert index.placeholder is placeholders[0]
 
 
 def test_a_multi_word_label_containing_a_connector_word_is_not_truncated(index):

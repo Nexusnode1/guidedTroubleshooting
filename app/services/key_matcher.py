@@ -13,7 +13,7 @@ from dataclasses import dataclass
 import re
 from typing import Any
 
-DUMMY_URI = "bixby://dummy_positive"
+from app.services.catalog import is_placeholder
 
 _TAP = re.compile(
     r"\b(?i:tap|select|touch|choose|open)(?:\s+(?i:and\s+hold))?(?:\s+(?i:on))?"
@@ -75,14 +75,22 @@ class DeeplinkChoice:
 
 
 class KeyIndex:
-    """Index of catalog entries by their exact Settings label."""
+    """Index of catalog entries by their exact Settings label.
+
+    ``placeholder`` is the catalog's own generic Settings-screen entry (if it has one); it
+    is never matched by label, only offered as the documented fallback.
+    """
 
     def __init__(self, catalog: Iterable[Mapping[str, Any]]) -> None:
         self._by_key: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
+        self.placeholder: Mapping[str, Any] | None = None
         for entry in catalog:
+            if is_placeholder(entry):
+                self.placeholder = self.placeholder or entry
+                continue
             validation = entry.get("validation")
             key = validation.get("key") if isinstance(validation, Mapping) else None
-            if isinstance(key, str) and entry.get("deeplink") != DUMMY_URI:
+            if isinstance(key, str):
                 self._by_key[normalize_label(key)].append(entry)
 
     def find(self, steps: Sequence[str], context: str) -> DeeplinkChoice | None:

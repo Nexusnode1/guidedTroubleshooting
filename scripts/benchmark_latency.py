@@ -39,14 +39,14 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from app.models.official_schema import ContextDeeplinkResponse  # noqa: E402
-from app.services.catalog import load_catalog, load_siis_rows  # noqa: E402
+from app.services.catalog import load_catalog, load_siis_rows, placeholder_uris  # noqa: E402
 
 PORT = 8931
 BASE_URL = f"http://127.0.0.1:{PORT}"
 N_COLD = 30
 N_FAST_EXACT = 30
 STARTUP_TIMEOUT_S = 180
-DUMMY = "bixby://dummy_positive"
+DUMMY_URIS = placeholder_uris(load_catalog())
 
 
 def percentile(values: list[float], q: float) -> float:
@@ -119,7 +119,7 @@ def run_smoke_test(client: httpx.Client, catalog: list[dict[str, Any]]) -> dict[
             link = group["actionableDeeplink"]
             if action["category"] == "manual" and link is not None:
                 manual_ok = False
-            if link is not None and link["deeplink"] != DUMMY and link["deeplink"] not in actionable:
+            if link is not None and link["deeplink"] not in DUMMY_URIS and link["deeplink"] not in actionable:
                 deeplinks_ok = False
     return {
         "health_ok": True,

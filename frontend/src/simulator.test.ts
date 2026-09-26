@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { openDeeplink } from "./simulator";
 
-const base = { deeplink: "bixby://masked/act/14eb42b895", description: "d" };
+const base = { deeplink: "voiceassist://masked/act/14eb42b895", description: "d" };
 
 describe("openDeeplink", () => {
   it("turns a toggle on for onURL and names the setting", () => {
@@ -27,15 +27,15 @@ describe("openDeeplink", () => {
   it("carries the validation label and the untouched URI", () => {
     const screen = openDeeplink(
       { ...base, message: "View Wi-Fi", originalType: "onClickURL" },
-      { deeplink: "bixby://masked/val/x", key: "Wi-Fi" },
+      { deeplink: "voiceassist://masked/val/x", key: "Wi-Fi" },
     );
     expect(screen.verifiedKey).toBe("Wi-Fi");
-    expect(screen.uri).toBe("bixby://masked/act/14eb42b895");
+    expect(screen.uri).toBe("voiceassist://masked/act/14eb42b895");
   });
 
   it("falls back to the description, then to Settings, when there is no message", () => {
     expect(openDeeplink({ ...base, description: "Opens the Storage Settings screen", originalType: "placeholder" }).title)
       .toBe("Storage Settings screen");
-    expect(openDeeplink({ deeplink: "bixby://x", description: "", message: "" }).title).toBe("Settings");
+    expect(openDeeplink({ deeplink: "voiceassist://x", description: "", message: "" }).title).toBe("Settings");
   });
 });

@@ -59,8 +59,8 @@ is the semantic cache lookup specifically, which *is* dense-embedding-based.
 | # | Category | Query | Path |
 | --- | --- | --- | --- |
 | 1 | Standard/auto action | "Touch responses are laggy" | cache hit |
-| 2 | Multi-step flow (auto -> manual -> critical) | "My Samsung tablet screen flashes and then goes completely blank whenever I tap to open an email in Gmail" | cache hit |
-| 3 | Manual/critical, no fabricated deeplink | "My Galaxy phone's screen is completely cracked, it's a total crack and I can't use the device." | cache hit |
+| 2 | Multi-step flow (auto -> manual -> critical) | "My TechCorp A15G tablet screen flashes and then goes completely blank whenever I tap to open an email in Gmail" | cache hit |
+| 3 | Manual/critical, no fabricated deeplink | "My smartphone's screen is completely cracked, it's a total crack and I can't use the device." | cache hit |
 | 4 | Paraphrase demonstrating semantic matching | "my phone screen is black and will not turn on" | cache hit (semantic, not exact-string; from `tests/fixtures/paraphrases.json`) |
 | 5 | Cross-domain, outside Display (Battery) | "My Galaxy phone's battery is draining much faster than it used to." | cold path, `siis_response` supplied from `tests/fixtures/cross_domain_articles.json` |
 
@@ -84,7 +84,7 @@ is the semantic cache lookup specifically, which *is* dense-embedding-based.
 ### 3. Cracked screen -- pure manual, no fabricated deeplink
 
 - **goal**: `Follow these steps to perform this Cracked Bleeding Screen Troubleshooting` · **title**: `Cracked bleeding screen` · **score**: 0.83
-- Both actions `manual`, `actionableDeeplink: null`: "Samsung Repair Services" (schedule a repair) and "Samsung Authorized Service Centers" (visit one).
+- Both actions `manual`, `actionableDeeplink: null`: "Authorized Repair Services" (schedule a repair) and "Authorized Service Centers" (visit one).
 - **Demonstrates**: the system does not invent a Settings deeplink for a physical hardware problem -- it correctly says "this needs a person," which is exactly the "no hallucinated steps" requirement in practice, not just in the abstract.
 
 ### 4. "my phone screen is black and will not turn on" -- semantic paraphrase match
@@ -142,7 +142,7 @@ critical (Factory Data Reset) last, with the warning banner. Click **Open** on t
 step; the phone simulator on the right shows the real, catalog-verified Settings screen
 (Touch sensitivity, toggled on).
 
-**0:40-1:05 -- Multi-step flow, one query, three categories (query 2).** Type *"My Samsung
+**0:40-1:05 -- Multi-step flow, one query, three categories (query 2).** Type *"My TechCorp A15G
 tablet screen flashes and then goes completely blank whenever I tap to open an email in
 Gmail"*. *Say:* "One complaint, one query -- and the engine still returns a fully ordered plan
 spanning all three categories." Point out: one `auto` action with a real Wi-Fi deeplink, two
@@ -152,7 +152,7 @@ and, again, no deeplink.
 
 **1:05-1:25 -- Honest "no deeplink" case (query 3).** Click the *"My screen is cracked"* chip.
 *Say:* "For a genuinely physical problem, it doesn't invent a Settings screen -- both steps
-route to Samsung Repair Services, with no fabricated deeplink." (Optional, if time: point out
+route to authorized repair services, with no fabricated deeplink." (Optional, if time: point out
 the manual/critical categories never carry an actionable deeplink at all -- that's enforced by
 the schema validator, not just convention.)
 

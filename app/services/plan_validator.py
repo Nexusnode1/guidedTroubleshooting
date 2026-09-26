@@ -15,6 +15,8 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictStr, ValidationError
 
+from app.services.catalog import placeholder_uris
+
 
 class _Condition(str, Enum):
     greater = "greater"
@@ -202,6 +204,7 @@ def _validate_plan_rules(
     parsed: _ContextResponse,
     actionable_uris: set[str],
     validation_uris: set[str],
+    fallback_uris: frozenset[str] = frozenset(),
 ) -> list[str]:
     errors: list[str] = []
     if not isinstance(raw_variations, list) or not all(isinstance(item, str) for item in raw_variations):
@@ -262,7 +265,7 @@ def _validate_plan_rules(
                     errors.append(f"{group_prefix}.actionableDeeplink is forbidden for manual actions")
                 if actionable is not None:
                     uri = actionable.deeplink
-                    if uri == "bixby://dummy_positive":
+                    if uri in fallback_uris:
                         placeholder_words = (
                             len(_WORD.findall(actionable.description)),
                             len(_WORD.findall(actionable.message or "")),
@@ -305,7 +308,9 @@ def validate_plan(
     if not entries and _contains_actionable_deeplink(body):
         errors.append("catalog is required for actionable deeplink validation")
 
-    errors.extend(_validate_plan_rules(body, variations, parsed, actionable_uris, validation_uris))
+    errors.extend(
+        _validate_plan_rules(body, variations, parsed, actionable_uris, validation_uris, placeholder_uris(entries))
+    )
     if errors:
         return PlanValidationResult(False, tuple(dict.fromkeys(errors)), None)
     return PlanValidationResult(True, (), parsed.model_dump(mode="python"))

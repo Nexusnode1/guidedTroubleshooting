@@ -6,7 +6,7 @@
 ---
 
 ## 1. Schema & Rule Compliance
-Evaluated over the 17 plans built from the official sample rows.
+Evaluated over the 18 plans built from the official sample rows.
 
 | Metric | Target | Measured Value |
 | :--- | :--- | :--- |
@@ -33,8 +33,8 @@ No ground-truth plans were supplied, so step accuracy and deeplink relevance wer
 | Execution Path | Target (P95) | P50 (ms) | P95 (ms) | Result |
 | :--- | :--- | :--- | :--- | :--- |
 | Cache hit - exact query match | <= 300 ms | 0.1 | 0.1 | met |
-| Cache hit - unseen semantic paraphrase | <= 300 ms | 25.2 | 30.7 | met |
-| Cold query - full pipeline extraction & mapping | <= 8000 ms | 241.0 | 251.8 | met |
+| Cache hit - unseen semantic paraphrase | <= 300 ms | 26.5 | 30.3 | met |
+| Cold query - full pipeline extraction & mapping | <= 8000 ms | 277.2 | 300.3 | met |
 
 ---
 
@@ -44,8 +44,8 @@ No ground-truth plans were supplied, so step accuracy and deeplink relevance wer
 | :--- | :--- | :--- |
 | Cold query average inference cost | Tracked | $0.00 |
 | Cache hit inference cost | $0.00 | $0.00 |
-| Semantic cache hit rate (unseen paraphrases, correct plan) | >= 80% | 89.3% (25 of 28; 2 hit a wrong plan) - met |
-| Per held-out set | | paraphrases: 13/14; paraphrases_holdout: 12/14 |
+| Semantic cache hit rate (unseen paraphrases, correct plan) | >= 80% | 85.7% (24 of 28; 3 hit a wrong plan) - met |
+| Per held-out set | | paraphrases: 12/14; paraphrases_holdout: 12/14 |
 | Unrelated queries wrongly answered | 0 | 0 of 12 |
 | Cost derivation method | - | no generative calls; (prompt tokens + completion tokens) x rate = 0 |
 
@@ -57,7 +57,7 @@ No ground-truth plans were supplied, so step accuracy and deeplink relevance wer
 | :--- | :--- | :--- | :--- | :--- |
 | Baseline: Full LLM Deeplink Mapping | not run | not run | not run | No LLM in this version. |
 | Variant A: Hybrid BM25 + Dense Embedding Retrieval | not scored | not run | $0.00 | Tried on real sections and rejected: min-max fusion scores the top hit near 1.0 even for unrelated screens (for example "Restart in Safe Mode" against "One-handed mode"). |
-| Variant B: Pure Rules-Based Deeplink Mapping | not scored | 251.8 ms cold | $0.00 | Exact match of the tapped UI label to the catalog's `validation.key`. This is what ships. |
+| Variant B: Pure Rules-Based Deeplink Mapping | not scored | 300.3 ms cold | $0.00 | Exact match of the tapped UI label to the catalog's `validation.key`. This is what ships. |
 | Cache lookup: hashed bag-of-words embedding | n/a | fast | $0.00 | 8 of 14 paraphrases on the first set. Fallback only (`EMBEDDING_MODEL=hash`). |
 | Cache lookup: all-mpnet-base-v2 + action-content keys | n/a | see section 3 | $0.00 | Default. Meets the hit-rate target on both held-out sets. |
 
@@ -68,6 +68,6 @@ No ground-truth plans were supplied, so step accuracy and deeplink relevance wer
 * Remaining paraphrase misses are ambiguous complaints, for example a smashed screen where the user cannot see anything (cracked screen versus recovering data). Rows 3 and 11 yield a thin plan (a single force-restart action) because their source article is mostly unrelated text.
 * Held-out sets are small (14 queries each); treat the percentages as indicative, not precise.
 * Multi-intent complaints (row 19) are answered for the dominant intent only.
-* Rows 6 and 18 do not exist in `siis_responses.json`. Rows 16, 17, and 20 are refused by the relevance gate.
+* Rows 6 and 18 do not exist in `siis_responses.json`. Rows 16 and 20 are refused by the relevance gate.
 * The official `sample_output.json` has action descriptions of 9 and 11 words, against the written 5 to 7 word rule; this engine follows the written rule.
 * All 20 official rows are Display complaints. Battery/Camera/Performance generalization is checked separately, against author-written test articles, in `tests/test_domain_generalization.py` (see `docs/domain-coverage.md`), not in the figures above.

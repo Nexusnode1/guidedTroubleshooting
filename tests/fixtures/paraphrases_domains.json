@@ -6,7 +6,7 @@
     {"expect": "Camera app closes", "query": "whenever i tap the camera icon it force closes right away"},
     {"expect": "Camera app closes", "query": "camera keeps crashing every time i try to take a photo"},
     {"expect": "Device running slow", "query": "everything on my phone feels sluggish since the recent software update"},
-    {"expect": "Device running slow", "query": "apps are lagging and taking ages to load on my galaxy"}
+    {"expect": "Device running slow", "query": "apps are lagging and taking ages to load on my nexa"}
   ],
   "negatives": [
     "best way to cook rice",
