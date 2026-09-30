@@ -104,7 +104,8 @@ the fast path engage instead of falling back to cold-rebuild or no_match" -- rel
 hit, correct or not. It does **not** mean "retrieved the semantically correct plan"; that
 question is answered separately and already in detail by
 `docs/siis_paraphrase_baseline_benchmark.md` (Recall@1 87.3% test / 75.0% val) and
-`docs/cross_domain_generalization.md` (98.75% combined). Nothing here changes those figures.
+`docs/cross_domain_generalization.md` (98.75% combined when this was measured; 100% with the
+current cache configuration). Nothing here changes those figures.
 
 ## Target validation
 

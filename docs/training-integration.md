@@ -8,8 +8,11 @@ small interface, so a model you train locally replaces the default without any c
 - `EMBEDDING_MODEL` (`app/config.py`) names the model: a Hugging Face id, a **local directory**, or `hash`.
 - `app/retrieval/st_embedder.py` loads it with `sentence-transformers`. A model you save with
   `model.save("models/my-embedder")` loads through exactly the same code.
-- `SIMILARITY_THRESHOLD` is the minimum cosine similarity for a cached plan to answer. It depends on the
-  model, so re-tune it whenever the model changes (step 4 below).
+- `SIMILARITY_THRESHOLD` (default 0.48) is the minimum weighted cosine similarity for a cached plan to
+  answer; boilerplate-paraphrase and critical-action keys are weighted 0.85 (`AUXILIARY_KEY_WEIGHT` in
+  `app/services/plan_cache.py`), and action keys are capped below any intent match of 0.60 or more
+  (`INTENT_CONFIDENCE`, same file). All three depend on the model, so re-tune them whenever the model
+  changes (step 4 below).
 - `tests/test_acceptance.py::test_a_model_saved_to_a_local_directory_loads_and_matches` proves the
   save-then-load path works.
 
@@ -41,7 +44,7 @@ small interface, so a model you train locally replaces the default without any c
 
 3. **Evaluate on the held-out sets**, without touching the running app:
 
-       python scripts/benchmark.py --embedding-model models/my-embedder --threshold 0.45
+       python scripts/benchmark.py --embedding-model models/my-embedder --threshold 0.48
 
    This rewrites `metrics.md` with hit rate (target 80%), false answers (target 0), and latency
    (target P95 300 ms). Try a few thresholds and keep the best that still answers no unrelated query.

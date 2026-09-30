@@ -22,14 +22,13 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from app.config import EMBEDDING_MODEL  # noqa: E402
+from app.config import EMBEDDING_MODEL, SIMILARITY_THRESHOLD  # noqa: E402
 from app.retrieval.st_embedder import load_embedder  # noqa: E402
 from app.services.catalog import load_catalog, load_siis_rows  # noqa: E402
 from app.services.plan_builder import PlanBuilder  # noqa: E402
 from app.services.plan_cache import PlanCache  # noqa: E402
 
 DATASET_PATH = ROOT / "data" / "processed" / "siis_paraphrase_dataset.json"
-DEFAULT_THRESHOLD = 0.45
 K_VALUES = (1, 3, 5)
 
 
@@ -43,7 +42,7 @@ def _build_cache(dataset: dict[str, Any], catalog: list[dict[str, Any]], embedde
     """Seed the cache from train-role rows only: canonical query + train-split paraphrases."""
     official_by_id = {r["id"]: r for r in load_siis_rows()}
     builder = PlanBuilder(catalog)
-    cache = PlanCache(catalog, model=embedder, threshold=DEFAULT_THRESHOLD)
+    cache = PlanCache(catalog, model=embedder, threshold=SIMILARITY_THRESHOLD)
     for row in dataset["rows"]:
         if row["role"] != "train" or not row["plan_valid"]:
             continue
@@ -166,7 +165,7 @@ def main() -> int:
         "# SIIS Paraphrase Dataset: Baseline Retrieval Benchmark",
         "",
         "No fine-tuning has happened. This measures the current, off-the-shelf embedding model",
-        f"(`{cache.embedder_name}`, similarity threshold used for cache hits: {DEFAULT_THRESHOLD};",
+        f"(`{cache.embedder_name}`, similarity threshold used for cache hits: {SIMILARITY_THRESHOLD};",
         "Recall@k/MRR below rank all cached plans and ignore that threshold, per",
         "`PlanCache.top_matches`) against `data/processed/siis_paraphrase_dataset.json`.",
         "",

@@ -51,6 +51,10 @@ replacement (see `docs/training-integration.md`).
 
 Every validated plan is stored under: the original query, its generated paraphrases (the
 official 8-10 `query_variations`), and one "action name + first step" key per action.
+Lookup scores are weighted: boilerplate-framed paraphrases and critical-action keys count at
+0.85, and action keys are capped just below any query/paraphrase/topic match of 0.60 or more,
+so a remedy step cannot outrank a confident match on the complaint itself. A weighted score of
+at least `SIMILARITY_THRESHOLD` (default 0.48) is a hit.
 
 ## Swap points
 

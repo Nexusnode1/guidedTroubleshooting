@@ -43,6 +43,21 @@ Every text is normalized (lower-cased, whitespace-collapsed) before embedding, e
 **Rank of the incorrect target (negative):** 1, score 0.6663
 **Margin:** 0.0304 (narrow)
 
+**Current configuration.** The scores in this document are raw cosine similarities, measured
+when every key counted equally. The cache now multiplies the similarity of boilerplate-framed
+paraphrases (the "This is so annoying - ..." variation above) and critical-action keys by 0.85.
+Re-measured with those weights alone, `top_matches` returned the negative at 0.6466 (its plan
+key "Clear The Camera App Cache. Go to Settings.") and the positive at 0.6359, a margin of
+0.0107, consistent with the "without generated variations" comparison in the next section.
+
+**Resolution.** That winning key is a remedy step, not a description of the complaint. On
+intent keys alone (query, paraphrases, topic phrases) the positive was already ahead: 0.6359
+against 0.6289. The cache now caps action keys just below the best intent match whenever that
+match reaches 0.60 (`INTENT_CONFIDENCE` in `app/services/plan_cache.py`), so the query ranks
+the positive first (0.6359 against 0.6358) and all ten texts of the fixture rank their own
+plan first. The sections below are the analysis of the earlier miss, kept as history; the
+0.007 intent gap is small, so `tests/test_camera_hard_negative.py` keeps the case under test.
+
 ## Isolating the cause: is it the auto-generated `query_variations`, or something more fundamental?
 
 `generate_variations()` (used to populate the official `query_variations` field, and also
@@ -87,12 +102,12 @@ Both plans independently pass the validation firewall. The failure is entirely a
 retrieval/ranking stage, before screen resolution or deeplink mapping are reached for the
 correct target -- it is not a screen-resolution or final-mapping problem.
 
-## Frozen baseline (current, non-fine-tuned embedding model)
+## Earlier baseline (before the intent cap; now Recall@1 1.00, MRR 1.00, N=10)
 
 Computed from `tests/fixtures/camera_hard_negative.json` (5 positive + 5 hard-negative
 paraphrases, including the confusable query as one of the 5 positive paraphrases), against a
-cache seeded with only the two competing canonical queries -- exactly the scenario
-`tests/test_camera_hard_negative.py` locks in as a regression test:
+cache seeded with only the two competing canonical queries -- the scenario
+`tests/test_camera_hard_negative.py` uses. These were the values before the intent cap:
 
 | Metric | Value |
 | --- | --- |
@@ -103,9 +118,9 @@ cache seeded with only the two competing canonical queries -- exactly the scenar
 | Positive rank (confusable query) | 2 |
 | Hard-negative rank (confusable query) | 1 |
 
-The single miss is exactly the confusable query identified above; every other paraphrase on
-both sides ranks first. This is the baseline any future change (fine-tuning, a reranker, or
-a fix to this specific pair) should be measured against.
+The single miss was exactly the confusable query identified above; every other paraphrase on
+both sides ranked first. With the intent cap the confusable query ranks the positive first
+too, so the test now asserts 10 of 10.
 
 ## Supplementary (NOT part of the shipped pipeline): BM25 and hybrid, same text
 

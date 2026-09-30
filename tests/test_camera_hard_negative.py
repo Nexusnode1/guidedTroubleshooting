@@ -2,10 +2,12 @@
 
 See docs/camera_hard_negative_analysis.md for the full analysis and
 tests/fixtures/camera_hard_negative.json (SYNTHETIC HARD-NEGATIVE FIXTURE) for the fixture
-itself, built from the already-verified tests/fixtures/cross_domain_articles.json. This locks
-in the frozen baseline (Recall@1=0.90, Recall@3=1.00, MRR=0.95, N=10) so a future change
-(fine-tuning, a reranker, or a targeted fix) can be measured against a known starting point,
-and so the specific known failure cannot silently get worse without being noticed.
+itself, built from the already-verified tests/fixtures/cross_domain_articles.json. The
+confusable query used to be answered with the crash plan, because that plan's action key (a
+remedy step) outscored both plans' intent keys; the baseline then was Recall@1=0.90,
+Recall@3=1.00, MRR=0.95 (N=10). Action keys no longer outrank a confident intent match, so
+all ten texts now rank their own plan first. The two plans' intent keys stay close for the
+confusable query, so these tests keep the case from silently regressing.
 """
 
 from __future__ import annotations
@@ -76,19 +78,21 @@ def test_camera_crashes_paraphrases_all_rank_first(service, expected_titles, tex
 
 
 @pytest.mark.acceptance
-def test_the_known_confusable_query_still_reproduces_the_documented_frozen_baseline_miss(service, expected_titles):
-    """This is a known, documented failure (docs/camera_hard_negative_analysis.md), not an
-    aspiration: it asserts the CURRENT, observed behavior so that a change to it -- in either
-    direction -- is visible and must be a deliberate, evaluated decision, not a silent drift."""
+def test_the_confusable_query_ranks_the_launch_failure_plan_above_the_crash_plan(service, expected_titles):
+    """The user describes the app not opening. The crash plan's remedy step ("Clear The Camera
+    App Cache") is its closest key, but a remedy is not the complaint: it must not outrank the
+    launch-failure plan's own intent match. Asserts the observed ranks recorded in the fixture,
+    so a change in either direction is visible and has to be a deliberate, evaluated decision."""
     text = HARD_NEGATIVE["confusable_query"]["text"]
-    positive_rank = _rank(service, text, expected_titles["positive"])
-    negative_rank = _rank(service, text, expected_titles["hard_negative"])
-    assert positive_rank == HARD_NEGATIVE["confusable_query"]["observed_dense_scores"]["positive_rank"]
-    assert negative_rank == HARD_NEGATIVE["confusable_query"]["observed_dense_scores"]["hard_negative_rank"]
+    observed = HARD_NEGATIVE["confusable_query"]["observed_scores"]
+    assert _rank(service, text, expected_titles["positive"]) == observed["positive_rank"] == 1
+    assert _rank(service, text, expected_titles["hard_negative"]) == observed["hard_negative_rank"] == 2
+    hit = service.cache.lookup(text)
+    assert hit is not None and hit.entry.response["contexts"][0]["title"] == expected_titles["positive"]
 
 
 @pytest.mark.acceptance
-def test_the_frozen_baseline_metrics_are_recall_at_1_090_recall_at_3_100_mrr_095(service, expected_titles):
+def test_every_camera_text_ranks_its_own_plan_first(service, expected_titles):
     hits = {k: 0 for k in K_VALUES}
     reciprocal_ranks = []
     total = 0
@@ -101,6 +105,6 @@ def test_the_frozen_baseline_metrics_are_recall_at_1_090_recall_at_3_100_mrr_095
                     hits[k] += 1
             reciprocal_ranks.append(1.0 / rank if rank is not None else 0.0)
     assert total == 10
-    assert hits[1] / total == pytest.approx(0.90)
+    assert hits[1] / total == pytest.approx(1.00)
     assert hits[3] / total == pytest.approx(1.00)
-    assert sum(reciprocal_ranks) / total == pytest.approx(0.95)
+    assert sum(reciprocal_ranks) / total == pytest.approx(1.00)

@@ -3,7 +3,9 @@
 Only plans that pass ``validate_plan`` can enter the cache, and every entry is
 re-validated when a saved cache is loaded. Lookup is cosine similarity between
 the query embedding and every stored key (the original query, its paraphrases,
-and one "action name + first step" key per action).
+and one "action name + first step" key per action), scaled by the key's weight.
+The first two describe the complaint (intent keys); action keys describe a remedy,
+and cannot outrank a confident intent match.
 """
 
 from __future__ import annotations
@@ -19,7 +21,21 @@ import numpy as np
 from app.config import SIMILARITY_THRESHOLD
 from app.retrieval.embeddings import EmbeddingModel, HashEmbeddingModel
 from app.services.plan_validator import validate_plan
-from app.services.variations import normalize_query
+from app.services.variations import framed_variations, normalize_query
+
+# Weight applied to the similarity of keys that are weaker evidence of a match: paraphrases
+# that wrap the complaint in wording shared by every plan ("my phone is acting up, ..."),
+# and keys for critical actions (restart, safe mode, reset), which close most plans
+# whatever the complaint was. At full weight, a query that only echoes that shared wording
+# can outscore a genuine paraphrase. Tune it together with SIMILARITY_THRESHOLD.
+AUXILIARY_KEY_WEIGHT = 0.85
+# An action key says how a plan fixes a problem, not which problem the user has. Two plans
+# for different complaints can share a remedy, so once any plan's intent keys (the query,
+# its paraphrases, the topic phrases) match at or above this score, action keys are capped
+# just below that match and the complaint decides. Below it, no plan recognises the
+# complaint itself, and a query that asks for an action directly is still answered by it.
+INTENT_CONFIDENCE = 0.60
+_ACTION_CAP_MARGIN = 1e-4
 
 
 @dataclass(frozen=True)
@@ -34,7 +50,7 @@ class CacheEntry:
 
 @dataclass(frozen=True)
 class CacheHit:
-    """A lookup result with its similarity to the closest stored key."""
+    """A lookup result with its weighted similarity to the best-scoring stored key."""
 
     entry: CacheEntry
     similarity: float
@@ -46,6 +62,8 @@ class _Key:
     entry_id: str
     normalized: str
     vector: list[float]
+    weight: float = 1.0
+    action: bool = False
 
 
 def _plan_keys(response: Mapping[str, Any]) -> list[str]:
@@ -73,6 +91,8 @@ class PlanCache:
         self._keys: list[_Key] = []
         self._exact: dict[str, str] = {}
         self._matrix: np.ndarray | None = None
+        self._weights: np.ndarray | None = None
+        self._actions: np.ndarray | None = None
 
     def __len__(self) -> int:
         return len(self._entries)
@@ -99,10 +119,18 @@ class PlanCache:
         self._entries[entry_id] = CacheEntry(entry_id, query, variations, response)
         self._keys = [key for key in self._keys if key.entry_id != entry_id]
         self._exact = {k: v for k, v in self._exact.items() if v != entry_id}
-        texts = list(dict.fromkeys(t for t in (normalize_query(x) for x in (query, *variations, *_plan_keys(response))) if t))
-        for text, vector in zip(texts, self._embed_many(texts)):
+        framed = {normalize_query(text) for text in framed_variations(query)}
+        weights = {normalize_query(query): 1.0}
+        for text in map(normalize_query, variations):
+            weights.setdefault(text, AUXILIARY_KEY_WEIGHT if text in framed else 1.0)
+        intent = set(weights)
+        for text, action in zip(_plan_keys(response), response["contexts"][0]["actions"]):
+            critical = action["category"] == "critical"
+            weights.setdefault(normalize_query(text), AUXILIARY_KEY_WEIGHT if critical else 1.0)
+        weights.pop("", None)
+        for text, vector in zip(weights, self._embed_many(list(weights))):
             self._exact.setdefault(text, entry_id)
-            self._keys.append(_Key(entry_id, text, vector))
+            self._keys.append(_Key(entry_id, text, vector, weights[text], text not in intent))
         self._matrix = None
 
     def add_lookup_keys(self, entry_id: str, texts: Iterable[str]) -> None:
@@ -124,10 +152,28 @@ class PlanCache:
             matrix = np.asarray([key.vector for key in self._keys], dtype=np.float32)
             norms = np.linalg.norm(matrix, axis=1, keepdims=True)
             self._matrix = matrix / np.where(norms == 0, 1.0, norms)
+            self._weights = np.asarray([key.weight for key in self._keys], dtype=np.float32)
+            self._actions = np.asarray([key.action for key in self._keys], dtype=bool)
         return self._matrix
 
+    def _scores(self, unit_vector: np.ndarray) -> np.ndarray:
+        """Score every stored key against a unit query vector.
+
+        A key's score is its cosine similarity scaled by its weight. When the best intent
+        key reaches ``INTENT_CONFIDENCE``, action keys are capped just below it.
+        """
+        scores = (self._key_matrix() @ unit_vector) * self._weights
+        intent = scores[~self._actions]
+        if intent.size and float(intent.max()) >= INTENT_CONFIDENCE:
+            cap = intent.max() - _ACTION_CAP_MARGIN
+            scores = np.where(self._actions, np.minimum(scores, cap), scores)
+        return scores
+
     def lookup(self, query: str) -> CacheHit | None:
-        """Return the closest cached plan at or above the similarity threshold."""
+        """Return the best-scoring cached plan at or above the similarity threshold.
+
+        Equal scores resolve to the key stored first, so the result is deterministic.
+        """
         normalized = normalize_query(query)
         if not normalized or not self._keys:
             return None
@@ -138,7 +184,7 @@ class PlanCache:
         norm = float(np.linalg.norm(vector))
         if norm == 0.0:
             return None
-        scores = self._key_matrix() @ (vector / norm)
+        scores = self._scores(vector / norm)
         best = int(scores.argmax())
         if float(scores[best]) < self.threshold:
             return None
@@ -148,7 +194,7 @@ class PlanCache:
         """Return up to ``k`` distinct cached plans ranked by similarity to ``query``.
 
         Unlike :meth:`lookup`, this ignores ``self.threshold`` and never uses the exact-match
-        fast path: it always ranks every stored key by cosine similarity first, then keeps
+        fast path: it always ranks every stored key by weighted similarity first, then keeps
         each entry's best-scoring key, so a query with several keys pointing at the same plan
         (canonical query, paraphrases, action names) counts as one candidate, not several. This
         is for reporting metrics such as Recall@k and MRR, where the point is to see how the
@@ -161,7 +207,7 @@ class PlanCache:
         norm = float(np.linalg.norm(vector))
         if norm == 0.0:
             return []
-        scores = self._key_matrix() @ (vector / norm)
+        scores = self._scores(vector / norm)
         best_per_entry: dict[str, float] = {}
         for key, score in zip(self._keys, scores):
             value = float(score)

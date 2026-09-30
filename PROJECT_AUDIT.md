@@ -2,7 +2,7 @@
 
 ## Scope and sources
 
-This audit inspected the complete workspace recursively and read `AGENTS.md`, `PROJECT_SPEC.md`, `ARCHITECTURE.md`, and `DATA_MODEL.md`.
+This audit inspected the complete workspace recursively and read `PROJECT_SPEC.md`, `ARCHITECTURE.md`, and `DATA_MODEL.md`.
 
 The official Theme 2 PDF, starter datasets, deeplink catalog, and official schema are absent from the workspace. Consequently, the official specification cannot be compared and this report does not claim any user-requested layout or bootstrap contract is an official requirement.
 
@@ -20,7 +20,7 @@ The official Theme 2 PDF, starter datasets, deeplink catalog, and official schem
 
 ```text
 smartSolveTroubleGuide/
-├── AGENTS.md                 ├── PROJECT_SPEC.md
+├── PROJECT_SPEC.md
 ├── ARCHITECTURE.md            ├── DATA_MODEL.md
 ├── PROJECT_AUDIT.md           ├── README.md
 ├── requirements.txt           ├── .gitignore

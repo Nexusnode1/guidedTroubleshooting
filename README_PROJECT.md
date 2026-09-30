@@ -22,7 +22,7 @@ A pure rules-based (no LLM, no generative model anywhere in this build) pipeline
    counts, ordering) before it is ever cached or returned.
 5. Caches every validated plan under its own query plus generated paraphrases, so a
    semantically similar future question ("touch is unresponsive and taps land late") gets the
-   same verified plan back in single-digit milliseconds instead of being rebuilt.
+   same verified plan back well inside the 300 ms fast-path target instead of being rebuilt.
 
 ## Architecture / pipeline
 
@@ -119,6 +119,33 @@ for that step (always true for `manual`/`critical` actions -- enforced by the va
 firewall, not just convention). `contexts: []` with `meta.fallback` set is the correct, honest
 answer when nothing relevant is cached -- never a fabricated plan.
 
+## How the evaluation criteria are met
+
+- **Deterministic execution.** The request path has no randomness and no generative model:
+  parsing, label matching, ordering and validation are rules, paraphrases come from fixed
+  templates, and cache lookup is a similarity ranking in which equal scores resolve to the key
+  stored first. The same input returns the same plan
+  (`tests/test_troubleshooting_service.py::test_identical_queries_give_identical_plans`,
+  `tests/test_cross_domain_generalization.py::test_the_same_query_produces_the_same_result_repeatedly`).
+- **Exact target-screen mapping, exact catalog deeplinks.** A step maps to a catalog entry only
+  when the UI label it taps equals that entry's `validation.key`; the URI is then copied
+  verbatim. When no entry matches, the step gets the catalog's own placeholder or no deeplink.
+- **One Action = One Screen.** Each step group carries at most one actionable deeplink, and
+  adjacent actions that resolve to the same screen are folded into one action
+  (`_merge_same_screen` in `app/services/plan_builder.py`).
+- **Action hierarchy.** Actions are ordered auto, then manual, then critical.
+- **Programmatic validation.** `app/services/plan_validator.py` checks every plan in code
+  (schema, goal/title/description rules, no URLs, catalog membership, no deeplink on
+  manual/critical actions, ordering) before it is cached or returned; none of these rules
+  depends on prompt wording, because there is no prompt.
+- **Operational metadata.** Every response carries `meta.latency_ms`, `meta.cache_hit`,
+  `meta.model` and `meta.cost_usd`.
+- **Cost and inference.** The request path performs no external model inference and calls no
+  provider API. The only model is the sentence-embedding model used for cache lookup, which
+  runs locally. There are therefore no prompt or completion tokens to report, and
+  `cost_usd` is 0.0 because no per-request API charge exists; the compute cost of hosting the
+  service has not been measured.
+
 ## Fast-Path semantic cache
 
 Every validated plan is stored (`data/processed/plan_cache.json`, rebuilt deterministically from
@@ -126,7 +153,14 @@ Every validated plan is stored (`data/processed/plan_cache.json`, rebuilt determ
 original query, its generated paraphrases, and one "action name + first step" key per action. A
 new request is embedded (`sentence-transformers/all-mpnet-base-v2` by default; swappable via
 `EMBEDDING_MODEL`, see `app/config.py`) and compared by cosine similarity against every stored
-key; a match above `SIMILARITY_THRESHOLD` (default 0.45) returns that cached, already-validated
+key. Two kinds of key count for less (their similarity is multiplied by 0.85,
+`AUXILIARY_KEY_WEIGHT` in `app/services/plan_cache.py`): paraphrases that wrap the complaint in
+wording shared by every plan ("my phone is acting up, ...") and keys for critical actions
+(restart, safe mode, reset), which close most plans whatever the complaint was. Action keys
+describe a remedy, not the complaint, so once any plan's query, paraphrase or topic keys match
+at 0.60 or above (`INTENT_CONFIDENCE`), action keys are capped just below that match and cannot
+outrank it. A weighted match
+at or above `SIMILARITY_THRESHOLD` (default 0.48) returns that cached, already-validated
 plan directly -- this is the mechanism that meets the sub-300ms Fast-Path latency target and the
 80% semantic-paraphrase-hit-rate target (see Benchmark results below). Nothing enters or leaves
 this cache without having passed the validation firewall first.
@@ -176,15 +210,17 @@ covers, built live through the full cold pipeline.
 
 ## Testing
 
-    pytest                                       # backend: 391 passed, 3 skipped (last run)
+    pytest                                       # backend: 494 passed, 7 skipped (last run)
     python scripts/benchmark.py                  # official-data metrics -> metrics.md
     python scripts/benchmark_paraphrase_dataset.py  # corrected paraphrase dataset -> docs/siis_paraphrase_baseline_benchmark.md
     python scripts/benchmark_cross_domain.py     # Battery/Camera/Performance fixture -> docs/cross_domain_generalization.md
     python scripts/benchmark_latency.py          # real REST latency against a live process -> docs/docker_latency_benchmark.md
     cd frontend && npm test -- --run && npm run build     # frontend tests and production build
 
-The 3 skipped backend tests are placeholders for features explicitly out of scope for this
-build (see their own skip reasons in-repo) -- not silently-disabled coverage of shipped code.
+Of the 7 skipped backend tests, 3 are placeholders for features explicitly out of scope for this
+build and 4 compare `data/original/` with a `student_kit` folder next to the repository, which
+was not present for that run (see their own skip reasons in-repo) -- not silently-disabled
+coverage of shipped code.
 
 ## Benchmark results
 
@@ -198,12 +234,20 @@ here is estimated or extrapolated. Full detail and methodology in the linked doc
 | Fast-Path cache, unseen paraphrase, P95 | 33.8 ms | **local process** (not Docker) | `docs/docker_latency_benchmark.md` |
 | Cold path (siis_response supplied), P95 | 286.9 ms | **local process** (not Docker) | `docs/docker_latency_benchmark.md` |
 | Semantic cache **hit rate** (engaged fast path vs. fell back) | 98.28% (57/58) | local process, official + held-out paraphrases | `docs/docker_latency_benchmark.md` |
-| Semantic cache **hit correctness** (unseen paraphrase -> correct plan) | 85.7% (24/28) | official held-out paraphrase sets | `metrics.md` |
+| Fast-Path cache, unseen paraphrase, P95 (current configuration) | 80 - 104 ms | **local machine, in-process, three single runs** (not Docker, not over HTTP) | `metrics.md` |
+| Cold path, P95 (current configuration) | 1062 - 1528 ms | **local machine, in-process, three single runs** (not Docker, not over HTTP) | `metrics.md` |
+| Semantic cache **hit correctness** (unseen paraphrase -> correct plan) | 89.3% (25/28) | official held-out paraphrase sets | `metrics.md` |
+| Ranking on those 28 paraphrases: Recall@1 / Recall@3 / Recall@5 / MRR | 0.893 / 0.964 / 0.964 / 0.927 | official held-out paraphrase sets | `metrics.md` |
+| Unrelated queries wrongly answered | 0 of 12 | fixture negatives | `metrics.md` |
+| Out-of-scope device complaints wrongly answered | 6 of 49 / 4 of 38 | probe set used while tuning / second probe set scored once afterwards | `metrics.md` |
 | Retrieval accuracy, Recall@1 | 89.1% (test) / 78.1% (val) | official-data paraphrase dataset, no fine-tuning | `docs/siis_paraphrase_baseline_benchmark.md` |
-| Retrieval accuracy, Recall@1 | 98.75% combined | **SYNTHETIC** Battery/Camera/Performance fixture (16 articles, 80 paraphrases) -- not production-scale evidence | `docs/cross_domain_generalization.md` |
+| Retrieval accuracy, Recall@1 / Recall@3 / Recall@5 / MRR | 100% (80/80) / 1.0 / 1.0 / 1.0 combined, deeplinks 16/16, 0 pipeline failures | **SYNTHETIC** Battery/Camera/Performance fixture (16 articles, 80 paraphrases) -- not production-scale evidence | `docs/cross_domain_generalization.md` |
 
 The four `docs/docker_latency_benchmark.md` rows were measured on the previous version of the
-official data and have not been re-run against the current reference set; the other rows were.
+official data, with the previous cache configuration (threshold 0.45, all keys at equal weight),
+on different hardware, and have not been re-run; the other rows reflect the current reference
+set and configuration. The two "current configuration" latency rows come from a slower, busy
+development machine and are not comparable with the `docs/docker_latency_benchmark.md` rows.
 
 "Hit rate" (did the fast path engage at all) and "hit correctness" (was the plan it returned the
 right one) are different measurements, kept separate above on purpose -- a high hit rate with a
@@ -227,10 +271,18 @@ Do not present the numbers above as Docker-container performance.
   "Buttons" case) and was reverted rather than shipped. Documented in
   `app/services/key_matcher.py`'s `find()` docstring, `docs/cross_domain_generalization.md`,
   `docs/docker_latency_benchmark.md`.
-- **Camera hard-negative ambiguity**: "camera won't open" and "camera crashes" are close enough
-  in embedding space that phrasing alone can occasionally pull the wrong one; a full
-  per-key score breakdown (including a supplementary BM25/hybrid comparison, not shipped) is in
+- **Camera hard negative, corrected but close**: "camera won't open" and "camera crashes" sit
+  close together in embedding space. The one query that used to retrieve the crash plan (its
+  remedy step outscored both plans' complaint wording) now retrieves the right plan, because
+  action keys can no longer outrank a confident intent match; all 80 cross-domain paraphrases
+  rank correctly. The two plans' intent scores for that query are only 0.007 apart (0.6359
+  against 0.6289), so a different embedding model could move it. Per-key breakdown in
   `docs/camera_hard_negative_analysis.md`.
+- **Out-of-scope complaints can still borrow a plan**: on complaints about features the official
+  rows do not cover, 6 of 49 (and 4 of 38 on a second set) were answered instead of falling back.
+  Most are Bluetooth complaints matching the screen-mirroring plan, whose steps mention
+  "Bluetooth and other device settings". Detail in `metrics.md` sections 4 and 6; the refused
+  cases are locked in by `tests/test_retrieval_hard_negatives.py`.
 - **Synthetic cross-domain fixture**: Battery/Camera/Performance generalization is checked
   against a 16-article, author-written fixture (`tests/fixtures/cross_domain_articles.json`),
   not real Samsung customer data or real SIIS content at production scale. It demonstrates the

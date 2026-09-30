@@ -6,7 +6,7 @@ in the linked document; this file only states the current status.
 | Item | Status | Evidence |
 | --- | --- | --- |
 | Source datasets untouched | READY | `data/original/siis_responses.json` and `deeplinks.json` confirmed byte-identical to `../student_kit/` and `git diff -- data/` empty, verified repeatedly, most recently in this audit |
-| Tests (backend) | READY | `pytest -q` -> 391 passed, 3 skipped (skips are documented placeholders for out-of-scope features, not disabled coverage) |
+| Tests (backend) | READY | `pytest -q` -> 494 passed, 7 skipped (3 skips are documented placeholders for out-of-scope features and 4 need a `student_kit` folder next to the repository, which was absent for this run; not disabled coverage) |
 | Tests (frontend) | READY | `npm test -- --run` -> 18/18 passing |
 | Frontend build | READY | `npm run build` -> `tsc --noEmit && vite build` succeeds |
 | Demo flow | READY | `docs/demo_readiness.md` section 5: a 2:45 script covering all 5 verified queries (Standard, Multi-step, Manual, Paraphrase, Battery cold-path) |
@@ -21,8 +21,10 @@ in the linked document; this file only states the current status.
 - **"Optimize now" / "Restart on schedule" parent-menu-match family**: can resolve to the parent
   "Battery" screen instead of correctly giving up. A general fix regressed a real official row
   and was reverted. `app/services/key_matcher.py`'s `find()` docstring.
-- **Camera hard-negative ambiguity**: "camera won't open" vs. "camera crashes" is a documented,
-  ambiguous-language confusion in embedding space. `docs/camera_hard_negative_analysis.md`.
+- **Camera hard negative, corrected but close**: "camera won't open" vs. "camera crashes" now
+  ranks correctly (80 of 80 on the synthetic cross-domain fixture), because action keys can no
+  longer outrank a confident intent match. The two plans' intent scores for the one confusable
+  query are only 0.007 apart. `docs/camera_hard_negative_analysis.md`.
 - **Synthetic cross-domain fixture**: Battery/Camera/Performance generalization is checked
   against a 16-article, author-written fixture, not production-scale real customer data.
   `docs/cross_domain_generalization.md`.

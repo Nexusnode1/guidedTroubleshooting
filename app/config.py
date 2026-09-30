@@ -13,9 +13,10 @@ PROCESSED_DIR = DATA_DIR / "processed"
 # directory (for example a model you fine-tuned and saved to models/my-embedder), or
 # "hash" for the dependency-free fallback used in fast tests.
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-mpnet-base-v2")
-# Minimum cosine similarity for a cached plan to answer a query. It is specific to the
-# embedding model: tune it with scripts/benchmark.py whenever the model changes.
-SIMILARITY_THRESHOLD = float(os.getenv("SIMILARITY_THRESHOLD", "0.45"))
+# Minimum weighted cosine similarity for a cached plan to answer a query (key weights are
+# in app/services/plan_cache.py). It is specific to the embedding model: tune it with
+# scripts/benchmark.py whenever the model changes.
+SIMILARITY_THRESHOLD = float(os.getenv("SIMILARITY_THRESHOLD", "0.48"))
 
 
 @dataclass(frozen=True)

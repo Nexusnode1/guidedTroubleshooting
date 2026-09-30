@@ -1,0 +1,223 @@
+{
+  "_label": "145-QUERY SEMANTIC RETRIEVAL EVALUATION SET",
+  "_disclaimer": "Author-written for this evaluation (not official Samsung/SIIS content, not copied from the official held-out sets). Queries are grouped by the official-data-cached plan title they are intended to represent, ONLY where a warmed plan for that title actually exists in this repository's data (see tests/test_retrieval_evaluation_145.py, which loads the live catalog/SIIS rows and asserts every 'expected_title' below is a real cached title before scoring anything). Two official rows currently exist in data/original/siis_responses.json but are gated by the relevance filter and never enter the cache: row_16 (rapid screen flashing while charging) and row_20 (visual distortion after receiving the phone). Because of that, queries about charger-triggered flashing or pure visual distortion have NO supported mapping today and are placed in the ambiguous/no_match_expected groups rather than guessed into a plan that doesn't actually cover them.",
+  "groups": {
+    "blank_black_display": {
+      "expected_title": "Blank black display",
+      "status": "supported",
+      "queries": [
+        {"text": "My phone screen is completely black and won't turn on.", "style": "direct"},
+        {"text": "The display stays black even though the phone is on and I can hear notifications.", "style": "indirect"},
+        {"text": "Screen went totally blank, no image at all, just black.", "style": "direct"},
+        {"text": "My tablet screen turns white and blank, no text shows up.", "style": "direct"},
+        {"text": "screen black won't turn on", "style": "short_search"},
+        {"text": "black screen no display", "style": "short_search"},
+        {"text": "This is SO annoying, my screen is just black and I can't do anything!", "style": "frustrated"},
+        {"text": "Ugh, the display won't light up at all no matter what I try.", "style": "frustrated"},
+        {"text": "The phone rings and vibrates for calls but the screen never lights up.", "style": "indirect"},
+        {"text": "My device charges fine and I can hear it working, but the screen shows nothing.", "style": "multi_symptom"},
+        {"text": "Screen is dark, no activation message, nothing happens when I press power.", "style": "direct"},
+        {"text": "My Nexa X1 won't show anything on the display after I updated it.", "style": "cross_device"},
+        {"text": "My TechCorp tablet's screen is a blank void, totally unresponsive to any light.", "style": "adversarial"},
+        {"text": "Why is my screen just dark all of a sudden, nothing I do brings it back?", "style": "frustrated"},
+        {"text": "The display only shows a blue tint with tiny unreadable text when I try to boot it up.", "style": "direct"},
+        {"text": "no display on my phone at all", "style": "short_search"},
+        {"text": "My tablet screen is completely black even though I just charged it overnight.", "style": "multi_symptom"},
+        {"text": "Every time I try to wake it up, the screen stays dark and does absolutely nothing.", "style": "indirect"}
+      ]
+    },
+    "cracked_bleeding_screen": {
+      "expected_title": "Cracked bleeding screen",
+      "status": "supported",
+      "queries": [
+        {"text": "My phone screen is cracked and I can't use it properly.", "style": "direct"},
+        {"text": "There's a big crack across my display and lines are spreading from it.", "style": "direct"},
+        {"text": "cracked screen phone", "style": "short_search"},
+        {"text": "screen shattered", "style": "short_search"},
+        {"text": "This is so frustrating, I dropped my phone and now the whole screen is smashed.", "style": "frustrated"},
+        {"text": "Colored lines and dead pixels are spreading across the glass after I dropped my tablet.", "style": "indirect"},
+        {"text": "The screen has a total crack right through the middle, it's unusable now.", "style": "direct"},
+        {"text": "My Nexa Fold X1's screen cracked again right where it folds.", "style": "cross_device"},
+        {"text": "There's ink-like bleeding spreading out from a crack on my display.", "style": "indirect"},
+        {"text": "The glass on my phone is completely shattered after it fell.", "style": "direct"},
+        {"text": "Why does my cracked screen keep getting worse, are there discolored patches now too?", "style": "frustrated"},
+        {"text": "My device fell and now there's a web of cracks and some dark bleeding spots on the panel.", "style": "multi_symptom"},
+        {"text": "I need a diagnostic and repair option for a badly cracked phone screen.", "style": "indirect"},
+        {"text": "TechCorp phone display totally shattered after a drop, glass is coming apart.", "style": "cross_device"},
+        {"text": "broken glass on my screen", "style": "short_search"}
+      ]
+    },
+    "touchscreen_issues": {
+      "expected_title": "Touchscreen issues",
+      "status": "supported",
+      "queries": [
+        {"text": "My touchscreen isn't responding to my taps at all.", "style": "direct"},
+        {"text": "Touch is really laggy, there's a delay every time I tap something.", "style": "direct"},
+        {"text": "touch not working", "style": "short_search"},
+        {"text": "screen unresponsive to touch", "style": "short_search"},
+        {"text": "This is so annoying, my taps just don't register half the time!", "style": "frustrated"},
+        {"text": "I have to press really hard and repeatedly before the screen does anything.", "style": "indirect"},
+        {"text": "My finger swipes don't move anything on the display anymore.", "style": "direct"},
+        {"text": "Touch input is delayed and sluggish on my Nexa X1 lately.", "style": "cross_device"},
+        {"text": "My TechCorp tablet's touch sensitivity feels off since the last update.", "style": "cross_device"},
+        {"text": "Why does the screen only respond to touch after I tap it three or four times?", "style": "frustrated"},
+        {"text": "My screen protector seems to be making touch input unreliable and sluggish.", "style": "indirect"},
+        {"text": "Taps register late and sometimes not at all when I'm typing on the keyboard.", "style": "multi_symptom"},
+        {"text": "The touch responsiveness has gotten really laggy over the past week.", "style": "direct"},
+        {"text": "My phone's screen works visually but doesn't react properly when I touch it.", "style": "indirect"},
+        {"text": "my screen protector makes touch input feel unreliable", "style": "short_search"}
+      ]
+    },
+    "screen_flickers": {
+      "expected_title": "Screen flickers",
+      "status": "supported",
+      "queries": [
+        {"text": "My screen flickers whenever I record a video.", "style": "direct"},
+        {"text": "There's a flickering line that shows up when I use the camera app.", "style": "direct"},
+        {"text": "screen flickering camera", "style": "short_search"},
+        {"text": "video flicker lines", "style": "short_search"},
+        {"text": "This is so annoying, the footage I record always has flickering bands in it!", "style": "frustrated"},
+        {"text": "My recorded videos have black flickering bars, especially indoors under LED lights.", "style": "indirect"},
+        {"text": "The camera preview flickers and stutters when I try to film something.", "style": "direct"},
+        {"text": "My Nexa Fold X1's screen flickers and goes blank whenever I open the camera.", "style": "cross_device"},
+        {"text": "Why does my video footage flicker so much under fluorescent lighting?", "style": "frustrated"},
+        {"text": "There's a strobing flicker artifact in every clip I shoot at night.", "style": "indirect"},
+        {"text": "My screen flickers and goes dark on and off while I'm recording.", "style": "multi_symptom"},
+        {"text": "TechCorp tablet camera app shows flickering horizontal bands during recording.", "style": "cross_device"},
+        {"text": "my video has a flickering line across it", "style": "short_search"}
+      ]
+    },
+    "access_smartphones_data": {
+      "expected_title": "Access smartphone's data",
+      "status": "supported",
+      "queries": [
+        {"text": "My inner screen stopped working but the outer cover screen still works fine.", "style": "direct"},
+        {"text": "The fold display shows nothing at all, it's like it's dead, but I can still get notifications.", "style": "indirect"},
+        {"text": "inner screen not working fold phone", "style": "short_search"},
+        {"text": "can't see my screen need my photos off", "style": "short_search"},
+        {"text": "This is so frustrating, my screen doesn't respond and I really need to back up my photos first.", "style": "frustrated"},
+        {"text": "My Nexa Fold X1's inner screen is completely dark and unresponsive on its own.", "style": "cross_device"},
+        {"text": "Nothing is visible on my display and I need a way to get my files off before I send it for repair.", "style": "indirect"},
+        {"text": "How do I connect a mouse to my phone when the screen won't respond to touch at all?", "style": "direct"},
+        {"text": "My touchscreen is completely dead and I can't see anything, but I still need to copy my pictures.", "style": "multi_symptom"},
+        {"text": "The inner panel of my foldable just went black by itself, the cover screen is unaffected though.", "style": "direct"},
+        {"text": "I can't see my display and want to save my pictures before I send it in for repair.", "style": "direct"},
+        {"text": "My TechCorp foldable's main screen shows no image at all, only the outer screen still lights up.", "style": "cross_device"},
+        {"text": "fold inner display dead outer screen fine", "style": "short_search"}
+      ]
+    },
+    "email_server": {
+      "expected_title": "Email server",
+      "status": "supported",
+      "queries": [
+        {"text": "Gmail keeps saying the server isn't responding on my tablet.", "style": "direct"},
+        {"text": "My email app won't sync new messages no matter how many times I refresh.", "style": "direct"},
+        {"text": "gmail server not responding", "style": "short_search"},
+        {"text": "email not syncing", "style": "short_search"},
+        {"text": "This is so annoying, my email just won't load any new mail at all!", "style": "frustrated"},
+        {"text": "Outlook keeps telling me it can't connect to the mail server on my phone.", "style": "direct"},
+        {"text": "My tablet flashes to a blank screen every time I try to open an email in Gmail.", "style": "indirect"},
+        {"text": "Why does my email account keep failing to load new messages lately?", "style": "frustrated"},
+        {"text": "My Gmail account will not open, it just spins and eventually errors out.", "style": "direct"},
+        {"text": "Can't get my email app to fetch anything new, it just hangs on loading forever.", "style": "indirect"},
+        {"text": "gmail app frozen won't load inbox", "style": "short_search"}
+      ]
+    },
+    "transfer_secure_folder": {
+      "expected_title": "Transfer secure folder",
+      "status": "supported",
+      "queries": [
+        {"text": "My screen stays blank when I try to scan the QR code for Data Transfer.", "style": "direct"},
+        {"text": "I can't use Data Transfer to move my files because the screen won't cooperate.", "style": "direct"},
+        {"text": "data transfer qr code blank screen", "style": "short_search"},
+        {"text": "transferring files old phone new phone", "style": "short_search"},
+        {"text": "This is so annoying, the wireless transfer between my old and new phone just won't start!", "style": "frustrated"},
+        {"text": "How do I move everything to my new Nexa X1 using a USB cable and Data Transfer?", "style": "cross_device"},
+        {"text": "My screen goes blank right when I try to scan the transfer QR code from my old device.", "style": "multi_symptom"},
+        {"text": "Which transfer method should I pick, wireless or cable, for moving my data to a new phone?", "style": "indirect"},
+        {"text": "I need to copy everything from my old TechCorp phone to my new one.", "style": "cross_device"},
+        {"text": "Scanning the QR code for wireless transfer just doesn't work, the screen stays blank.", "style": "direct"},
+        {"text": "wireless transfer QR scan screen blank", "style": "short_search"}
+      ]
+    },
+    "multi_window_app": {
+      "expected_title": "Multi window app",
+      "status": "supported",
+      "queries": [
+        {"text": "I want to remove an app pair shortcut from my Quick Access panel.", "style": "direct"},
+        {"text": "How do I use two apps side by side in split screen mode?", "style": "direct"},
+        {"text": "multi window app pair remove", "style": "short_search"},
+        {"text": "split screen not working", "style": "short_search"},
+        {"text": "This is so annoying, I can't figure out how to get rid of this app pair I made by accident!", "style": "frustrated"},
+        {"text": "There's a shortcut I don't want anymore sitting on my side panel, how do I remove it?", "style": "indirect"},
+        {"text": "I keep trying to delete an app pairing from the Quick Access panel and it won't go away.", "style": "direct"},
+        {"text": "How do I open an app in pop-up view while using another app on my Nexa X1?", "style": "cross_device"}
+      ]
+    },
+    "screen_mirroring_tv": {
+      "expected_title": "Screen mirroring tv",
+      "status": "supported",
+      "queries": [
+        {"text": "How do I mirror my phone's screen to my TV using Smart View?", "style": "direct"},
+        {"text": "My screen mirroring to the television keeps disconnecting midway.", "style": "direct"},
+        {"text": "mirror screen to tv smart view", "style": "short_search"},
+        {"text": "casting to tv not working", "style": "short_search"},
+        {"text": "This is so annoying, my TV mirroring keeps failing right after I connect it!", "style": "frustrated"},
+        {"text": "What's the difference between casting and mirroring my phone to the TV?", "style": "indirect"},
+        {"text": "My phone's screen stays small and won't fill the whole TV display when mirroring.", "style": "direct"},
+        {"text": "How do I disconnect a device I previously mirrored my screen to?", "style": "direct"}
+      ]
+    },
+    "device_issue_catch_all": {
+      "expected_title": "Device issue",
+      "status": "supported",
+      "queries": [
+        {"text": "Part of my touchscreen just stays black and won't respond to touch, and I'm not sure why.", "style": "indirect"},
+        {"text": "Some of my touchscreen just stays black and won't respond to touch at all.", "style": "indirect"},
+        {"text": "There's an area on my touchscreen that stays black and doesn't respond.", "style": "indirect"},
+        {"text": "It's so frustrating, part of my touchscreen just stays black and won't do anything!", "style": "frustrated"},
+        {"text": "A portion of the touchscreen is black and unresponsive while the rest works normally.", "style": "indirect"},
+        {"text": "So a chunk of my touchscreen just went black and stopped responding, any idea why?", "style": "frustrated"},
+        {"text": "What can I do if part of my touchscreen is black and doesn't respond at all?", "style": "indirect"},
+        {"text": "My screen goes completely blank, just a dark screen with occasional scrolling and no visible content.", "style": "direct"},
+        {"text": "half my screen is black half works", "style": "short_search"},
+        {"text": "one side of screen dark other works", "style": "short_search"}
+      ]
+    },
+    "ambiguous": {
+      "expected_title": null,
+      "status": "ambiguous",
+      "queries": [
+        {"text": "My phone screen is acting up.", "style": "vague"},
+        {"text": "Something is wrong with my display.", "style": "vague"},
+        {"text": "My screen looks distorted and warped since I got the phone.", "style": "unsupported_row_gated", "note": "row_20 covers this and is gated by the relevance filter; no cached plan exists for it."},
+        {"text": "The colors on my screen look wrong and stretched.", "style": "unsupported_row_gated"},
+        {"text": "My screen flashes really fast whenever I plug in the charger.", "style": "unsupported_row_gated", "note": "row_16 covers this and is gated by the relevance filter; no cached plan exists for it."},
+        {"text": "The display flickers in quick bursts only while it's charging.", "style": "unsupported_row_gated"},
+        {"text": "My screen is both cracked and completely black now.", "style": "multi_plan_conflict", "note": "spans Cracked bleeding screen and Blank black display; no single official plan covers both."},
+        {"text": "The touch doesn't work and the screen also flickers at the same time.", "style": "multi_plan_conflict", "note": "spans Touchscreen issues and Screen flickers."},
+        {"text": "My phone has a problem but I can't really describe what's happening.", "style": "vague"},
+        {"text": "It just stopped working right one day and I don't know what changed.", "style": "vague"},
+        {"text": "The screen sometimes looks fine and sometimes looks off, it's inconsistent.", "style": "vague"},
+        {"text": "There's something weird going on with how my screen looks lately.", "style": "vague"},
+        {"text": "My screen is cracked and also flickering now, not sure which to fix first.", "style": "multi_plan_conflict", "note": "spans Cracked bleeding screen and Screen flickers."}
+      ]
+    },
+    "no_match_expected": {
+      "expected_title": null,
+      "status": "no_match_expected",
+      "queries": [
+        {"text": "What is the capital of France?", "style": "unrelated"},
+        {"text": "How do I bake a chocolate cake?", "style": "unrelated"},
+        {"text": "My bluetooth headphones won't pair with my phone.", "style": "out_of_domain"},
+        {"text": "My battery drains really fast throughout the day.", "style": "out_of_domain"},
+        {"text": "The wifi on my phone keeps dropping every few minutes.", "style": "out_of_domain"},
+        {"text": "There's no sound coming from my phone's speaker.", "style": "out_of_domain"},
+        {"text": "My phone storage is completely full and I can't free up space.", "style": "out_of_domain"},
+        {"text": "How do I change the ringtone for text messages?", "style": "out_of_domain"},
+        {"text": "What's the weather forecast for tomorrow?", "style": "unrelated"},
+        {"text": "Can you recommend a good sci-fi novel to read?", "style": "unrelated"}
+      ]
+    }
+  }
+}

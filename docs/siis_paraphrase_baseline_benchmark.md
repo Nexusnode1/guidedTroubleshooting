@@ -1,7 +1,7 @@
 # SIIS Paraphrase Dataset: Baseline Retrieval Benchmark
 
 No fine-tuning has happened. This measures the current, off-the-shelf embedding model
-(`sentence-transformers/all-mpnet-base-v2`, similarity threshold used for cache hits: 0.45;
+(`sentence-transformers/all-mpnet-base-v2`, similarity threshold used for cache hits: 0.48;
 Recall@k/MRR below rank all cached plans and ignore that threshold, per
 `PlanCache.top_matches`) against `data/processed/siis_paraphrase_dataset.json`.
 
@@ -18,8 +18,14 @@ as a miss and not silently dropped from the total without explanation.
 
 | Split | Dataset size | Excluded | N (scored) | Recall@1 | Recall@3 | Recall@5 | MRR |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| val | 32 | 0 | 32 | 0.7812 | 0.9375 | 0.9375 | 0.8438 |
+| val | 32 | 0 | 32 | 0.7812 | 0.9062 | 0.9375 | 0.8292 |
 | test | 64 | 0 | 64 | 0.8906 | 1.0 | 1.0 | 0.9401 |
+
+Ranking uses the cache's weighted similarity (boilerplate-paraphrase and critical-action keys
+at 0.85). With every key at equal weight the val row was Recall@3 0.9375 and MRR 0.8438: three
+held-out `row_11` texts, none answered correctly at rank 1 either way, now have their expected
+plan one or two ranks lower. The test row and both Recall@1 values are the same under either
+weighting. The 0.60 intent cap on action keys changes no figure in this table.
 
 ## Excluded examples
 

@@ -1,7 +1,5 @@
 # Troubleshooting Chat and Engine Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
-
 > **Amendment (2026-09-22).** The hashed embedder measured 8 of 14 paraphrases, below the 80% target. Execution added a pretrained embedder behind the existing seam: `app/retrieval/st_embedder.py`, `EMBEDDING_MODEL` and `SIMILARITY_THRESHOLD` in `app/config.py`, cosine-only lookup with numpy in `plan_cache.py`, and one extra cache key per action (name plus first step). Where Tasks 7, 8, and 12 below differ, the code in the repository wins. Also added: a second held-out set (`tests/fixtures/paraphrases_holdout.json`), `tests/test_acceptance.py` (80% hit rate, 300 ms hit and 8 s cold P95, local-model loading), `scripts/dev.ps1`, `scripts/export_training_pairs.py`, and `docs/training-integration.md`. Result: 25 of 28 held-out paraphrases correct, 0 of 12 unrelated queries answered.
 
 **Goal:** A web chat where a user types a vague Galaxy complaint and gets an ordered, validated troubleshooting plan whose auto steps have an **Open** button that drives an on-page phone simulator.
@@ -10,7 +8,7 @@
 
 **Tech Stack:** Python 3.13, FastAPI, Pydantic v2, pytest, httpx (no new backend dependencies). Node 20, Vite 5, React 18, TypeScript, Vitest, Testing Library.
 
-**Spec:** `docs/superpowers/specs/2026-09-21-troubleshooting-chat-design.md`. Official contract: `../student_kit/` (PDF section numbers below refer to `Theme 2_Troubleshooting_Smart Guided Troubleshooting Engine.pdf`).
+**Spec:** `docs/specs/2026-09-21-troubleshooting-chat-design.md`. Official contract: `../student_kit/` (PDF section numbers below refer to `Theme 2_Troubleshooting_Smart Guided Troubleshooting Engine.pdf`).
 
 ## Global Constraints
 
@@ -3267,7 +3265,7 @@ The bootstrap docs still claim no official spec exists and describe a placeholde
 
 The official Theme 2 materials are in `data/original/` (copied unmodified from the participant kit). The contract is the PDF "Smart Guided Troubleshooting Engine"; the response schema is `app/models/official_schema.py`.
 
-The design for the current build, including the measured limits of the rules-only engine, is `docs/superpowers/specs/2026-09-21-troubleshooting-chat-design.md`. The implementation plan is `docs/superpowers/plans/2026-09-21-troubleshooting-chat.md`.
+The design for the current build, including the measured limits of the rules-only engine, is `docs/specs/2026-09-21-troubleshooting-chat-design.md`. The implementation plan is `docs/plans/2026-09-21-troubleshooting-chat.md`.
 
 Non-negotiable rules (PDF 4.2): zero URL leaks; deeplinks copied verbatim from the catalog; no hallucinated steps (no relevant text means `contexts: []` with a fallback); pure JSON responses.
 ```

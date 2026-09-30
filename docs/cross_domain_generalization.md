@@ -13,9 +13,9 @@ unchanged (`sentence-transformers/all-mpnet-base-v2`).
 | Domain | N | Recall@1 | Recall@3 | Recall@5 | MRR |
 | --- | --- | --- | --- | --- | --- |
 | Battery | 25 | 1.0 | 1.0 | 1.0 | 1.0 |
-| Camera | 30 | 0.9667 | 1.0 | 1.0 | 0.9833 |
+| Camera | 30 | 1.0 | 1.0 | 1.0 | 1.0 |
 | Performance | 25 | 1.0 | 1.0 | 1.0 | 1.0 |
-| combined | 80 | 0.9875 | 1.0 | 1.0 | 0.9938 |
+| combined | 80 | 1.0 | 1.0 | 1.0 | 1.0 |
 
 ## Pipeline diagnostics (cold path, one call per article)
 

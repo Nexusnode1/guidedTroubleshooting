@@ -6,17 +6,31 @@ none are hypothesized in advance and treated as findings.
 
 ## Observed
 
-1. **Camera app won't open vs. Camera app crashes.**
+No retrieval confusion remains on this fixture: all 80 paraphrases rank their own plan first
+(Recall@1 = 100% combined). The one confusion observed earlier is kept below as history.
+
+1. **Camera app won't open vs. Camera app crashes (corrected).**
    - Query: *"This is so annoying, I tap the camera icon and literally nothing happens."*
-   - Correct intent: `camera_wont_open_permission` ("Camera app won't", similarity 0.6359, rank 2)
-   - Retrieved instead: `camera_crashes_freezes` ("Camera app crashes", similarity 0.6663, rank 1)
+   - Correct intent: `camera_wont_open_permission` ("Camera app won't", similarity 0.6359, rank 2 at the time)
+   - Retrieved instead at the time: `camera_crashes_freezes` ("Camera app crashes", similarity 0.6663, rank 1)
    - Why confusable: "nothing happens when I tap it" is genuinely ambiguous between "the app
      never launches" (a permission/launch problem) and "the app launches and immediately dies"
      (a crash) -- a real customer complaint in this phrasing could plausibly mean either. The
      rank gap is narrow (0.0304), meaning the two intents sit close together in embedding space
      for this specific phrasing.
-   - This is the only miss across all 80 cross-domain paraphrases in this run (Recall@1 = 98.75%
-     combined). It was not observed for any other Camera, Battery, or Performance paraphrase.
+   - These similarities were measured with every cache key at equal weight. With key weights
+     alone (boilerplate-paraphrase and critical-action keys at 0.85) the same query still
+     scored 0.6466 for `camera_crashes_freezes` and 0.6359 for `camera_wont_open_permission`.
+     The 0.6466 came from the crash plan's action key "Clear The Camera App Cache. Go to
+     Settings.", a remedy step, while on complaint wording the right plan was already ahead
+     (0.6359 against 0.6289).
+   - Corrected by ranking the complaint above the remedy: once any plan's intent keys match at
+     0.60 or more, action keys are capped just below that match (`INTENT_CONFIDENCE` in
+     `app/services/plan_cache.py`). The query now ranks `camera_wont_open_permission` first
+     (0.6359 against 0.6358). The 0.007 gap between the two plans' intent keys is small, so the
+     case stays under regression test in `tests/test_camera_hard_negative.py`.
+   - This was the only miss across all 80 cross-domain paraphrases (Recall@1 was 98.75%
+     combined then). It was not observed for any other Camera, Battery, or Performance paraphrase.
 
 ## Checked for but not observed
 

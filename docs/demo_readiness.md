@@ -159,7 +159,7 @@ the schema validator, not just convention.)
 **1:25-1:50 -- Semantic matching (query 4).** Type *"my phone screen is black and will not turn
 on"* by hand (not a chip). *Say:* "This exact sentence isn't the training data -- the semantic
 cache is matching it by meaning." Point at the meta strip: cache hit, no LLM call, ~$0.00 cost,
-latency in single-digit milliseconds.
+latency well under the 300 ms target (the value shown depends on the machine).
 
 **1:50-2:30 -- Beyond Display, cold path (query 5).** Expand "paste raw troubleshooting text
 (cold path demo)" in the browser UI, click "Fill in the Battery example" (or, if using a

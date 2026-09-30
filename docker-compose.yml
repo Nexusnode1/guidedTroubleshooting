@@ -5,4 +5,4 @@ services:
       - "8000:8000"
     environment:
       - EMBEDDING_MODEL=${EMBEDDING_MODEL:-sentence-transformers/all-mpnet-base-v2}
-      - SIMILARITY_THRESHOLD=${SIMILARITY_THRESHOLD:-0.45}
+      - SIMILARITY_THRESHOLD=${SIMILARITY_THRESHOLD:-0.48}

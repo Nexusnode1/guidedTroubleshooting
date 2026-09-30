@@ -5,7 +5,7 @@ enrichment models below are therefore implementation contracts, not claims
 about the official response format.
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class TroubleshootRequest(BaseModel):
@@ -13,6 +13,16 @@ class TroubleshootRequest(BaseModel):
 
     query: str = Field(min_length=1, description="User-provided troubleshooting query.")
     siis_response: str | None = Field(default=None, description="Optional raw SIIS knowledge text.")
+
+    @field_validator("query")
+    @classmethod
+    def _query_has_searchable_text(cls, value: str) -> str:
+        """Reject a query that normalizes to nothing (blank, punctuation only, a bare URL)."""
+        from app.services.variations import searchable_text  # imports this module, so not at top level
+
+        if not searchable_text(value):
+            raise ValueError("query must contain searchable text")
+        return value
 
 
 class QueryEnrichmentResult(BaseModel):
