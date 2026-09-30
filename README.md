@@ -23,3 +23,7 @@ python -m pytest -q
 Build the frontend with:
 cd frontend
 npm run build
+
+PPT PRESENTATION- https://drive.google.com/file/d/1ni0A_5i_XONhL3r4mK5ai6MbOpsyxMTa/view?usp=drive_link
+VIDEO PRESENTATION- https://drive.google.com/file/d/1d9tQp6_i_HfoUqJe0kBjkfpNXeeOkSjk/view?usp=drive_link
+Ai disclosure form- https://docs.google.com/document/d/1tH2YW8sYDmTy7M4Bg2pa7_usvhdS-3M9/edit?usp=drive_link&ouid=107818180219584564151&rtpof=true&sd=true
